@@ -128,43 +128,58 @@ public final class BasicModules {
             }
         });
 
-        ModuleManager.register(new Module("Auto Pot", "Uses a healing or regeneration potion when health is low.", "Player") {
+        ModuleManager.register(new Module("Auto Pot", "Uses healing or regeneration potions from the hotbar or main inventory when health is low, then refills the used hotbar slot.", "Player") {
             private int previousSlot = -1;
             private int restoreTicks;
+            private int useCooldown;
+
             @Override public void onTick() {
                 Minecraft mc = Minecraft.getInstance();
                 LocalPlayer player = mc.player;
-                if (player == null || mc.gameMode == null) return;
-                if (restoreTicks > 0) {
-                    restoreTicks--;
-                    if (restoreTicks == 0 && previousSlot >= 0) {
-                        player.getInventory().selected = previousSlot;
-                        previousSlot = -1;
-                    }
-                    return;
+                if (player == null || mc.gameMode == null || !player.isAlive()) return;
+
+                if (restoreTicks > 0 && --restoreTicks == 0 && previousSlot >= 0) {
+                    player.getInventory().selected = previousSlot;
+                    previousSlot = -1;
                 }
-                if (player.getHealth() > 8.0f) return;
-                int potionSlot = -1;
-                for (int slot = 0; slot < 9; slot++) {
+                if (useCooldown > 0) useCooldown--;
+                if (restoreTicks > 0 || useCooldown > 0 || player.getHealth() > 8.0f) return;
+
+                int hotbarSlot = findPotion(player, 0, 9);
+                if (hotbarSlot < 0) {
+                    int inventorySlot = findPotion(player, 9, 36);
+                    if (inventorySlot < 0) return;
+                    hotbarSlot = player.getInventory().selected;
+                    mc.gameMode.handleInventoryMouseClick(
+                        player.containerMenu.containerId, inventorySlot, hotbarSlot,
+                        net.minecraft.world.inventory.ClickType.SWAP, player
+                    );
+                }
+
+                previousSlot = player.getInventory().selected;
+                player.getInventory().selected = hotbarSlot;
+                mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
+                restoreTicks = 2;
+                useCooldown = 30;
+            }
+
+            private int findPotion(LocalPlayer player, int start, int end) {
+                for (int slot = start; slot < end; slot++) {
                     ItemStack stack = player.getInventory().getItem(slot);
                     if (!(stack.getItem() instanceof PotionItem)) continue;
                     String name = stack.getHoverName().getString().toLowerCase(java.util.Locale.ROOT);
-                    if (name.contains("healing") || name.contains("regeneration")) {
-                        potionSlot = slot;
-                        break;
-                    }
+                    if (name.contains("healing") || name.contains("instant health")
+                        || name.contains("regeneration")) return slot;
                 }
-                if (potionSlot < 0) return;
-                previousSlot = player.getInventory().selected;
-                player.getInventory().selected = potionSlot;
-                mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
-                restoreTicks = 2;
+                return -1;
             }
+
             @Override public void onDisable() {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.player != null && previousSlot >= 0) mc.player.getInventory().selected = previousSlot;
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (player != null && previousSlot >= 0) player.getInventory().selected = previousSlot;
                 previousSlot = -1;
                 restoreTicks = 0;
+                useCooldown = 0;
             }
         });
 
