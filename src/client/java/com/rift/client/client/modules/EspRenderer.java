@@ -211,10 +211,14 @@ public final class EspRenderer {
             double maxSq = max * max;
             for (Player target : level.players()) {
                 if (target == self || target.isRemoved()) continue;
+                String targetName = target.getGameProfile().name();
+                Module antiBot = ModuleManager.getModule("Anti-Bot");
+                if (antiBot != null && antiBot.isEnabled() && ClientUtilities.isLikelyBot(targetName)) continue;
                 if (self.distanceToSqr(target) > maxSq) continue;
                 AABB box = target.getBoundingBox();
+                Kind playerKind = ClientUtilities.isFriend(targetName) ? Kind.FRIEND : Kind.PLAYER;
                 visible.add(new Marker(0L, box.minX, box.minY, box.minZ,
-                    box.maxX, box.maxY, box.maxZ, Kind.PLAYER));
+                    box.maxX, box.maxY, box.maxZ, playerKind));
                 if (visible.size() >= MAX_MARKERS) break;
             }
         }
@@ -257,13 +261,14 @@ public final class EspRenderer {
             float r, g, b, a;
             switch (marker.kind) {
                 case PLAYER -> { r = 0.30f; g = 0.90f; b = 0.45f; a = 0.22f; }
+                case FRIEND -> { r = 0.25f; g = 0.65f; b = 1.00f; a = 0.28f; }
                 case STORAGE -> { r = 0.68f; g = 0.34f; b = 0.95f; a = 0.32f; }
                 default -> { r = 0.35f; g = 0.70f; b = 1.00f; a = 0.25f; }
             }
             float minX = (float) marker.x, minY = (float) marker.y, minZ = (float) marker.z;
-            float maxX = (float) (marker.kind == Kind.PLAYER ? marker.maxX : marker.x + 1);
-            float maxY = (float) (marker.kind == Kind.PLAYER ? marker.maxY : marker.y + 1);
-            float maxZ = (float) (marker.kind == Kind.PLAYER ? marker.maxZ : marker.z + 1);
+            float maxX = (float) ((marker.kind == Kind.PLAYER || marker.kind == Kind.FRIEND) ? marker.maxX : marker.x + 1);
+            float maxY = (float) ((marker.kind == Kind.PLAYER || marker.kind == Kind.FRIEND) ? marker.maxY : marker.y + 1);
+            float maxZ = (float) ((marker.kind == Kind.PLAYER || marker.kind == Kind.FRIEND) ? marker.maxZ : marker.z + 1);
             renderBox(pose.last().pose(), builder, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a);
         }
         pose.popPose();
@@ -325,7 +330,7 @@ public final class EspRenderer {
         lastRadius = -1;
     }
 
-    private enum Kind { PLAYER, STORAGE, BLOCK }
+    private enum Kind { PLAYER, FRIEND, STORAGE, BLOCK }
     private record Section(int chunkX, int sectionY, int chunkZ) {}
     private record Marker(long key, double x, double y, double z,
         double maxX, double maxY, double maxZ, Kind kind) {
