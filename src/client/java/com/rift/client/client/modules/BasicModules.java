@@ -348,7 +348,14 @@ public final class BasicModules {
         });
     }
 
-    private static float wrapDegrees(float angle) {\n        angle %= 360.0f;\n        if (angle >= 180.0f) angle -= 360.0f;\n        if (angle < -180.0f) angle += 360.0f;\n        return angle;\n    }\n\n    private static Field findField(Class<?> type, String name) {
+    private static float wrapDegrees(float angle) {
+        angle %= 360.0f;
+        if (angle >= 180.0f) angle -= 360.0f;
+        if (angle < -180.0f) angle += 360.0f;
+        return angle;
+    }
+
+    private static Field findField(Class<?> type, String name) {
         for (Class<?> current = type; current != null; current = current.getSuperclass()) {
             try { return current.getDeclaredField(name); }
             catch (NoSuchFieldException ignored) {}
