@@ -11,7 +11,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents;
@@ -53,6 +55,7 @@ public final class EspRenderer {
         new StagedVertexBuffer(() -> "RIFT ESP Buffer", RenderType.SMALL_BUFFER_SIZE);
 
     private static final List<Marker> SCANNED = new ArrayList<>();
+    private static final Set<Long> SCANNED_KEYS = new HashSet<>();
     private static final List<Section> SECTIONS = new ArrayList<>();
     private static List<Marker> frameMarkers = List.of();
     private static ClientLevel lastLevel;
@@ -82,6 +85,7 @@ public final class EspRenderer {
         boolean blocksOn = enabled("Block ESP");
         if (!storageOn && !blocksOn) {
             SCANNED.clear();
+            SCANNED_KEYS.clear();
             SECTIONS.clear();
             sectionCursor = 0;
             lastLevel = level;
@@ -102,11 +106,13 @@ public final class EspRenderer {
             lastCenterX = centerX;
             lastCenterZ = centerZ;
             lastRadius = radius;
-            rebuildSections(level, centerX, centerZ, radius);
+            rebuildSections(level, centerX, centerZ, radius, player.getBlockY() >> 4);
             SCANNED.clear();
+            SCANNED_KEYS.clear();
         }
 
         if (SECTIONS.isEmpty()) return;
+        for (int scan = 0; scan < 2 && !SECTIONS.isEmpty(); scan++) {
         Section section = SECTIONS.get(sectionCursor++);
         if (sectionCursor >= SECTIONS.size()) sectionCursor = 0;
 
@@ -124,13 +130,10 @@ public final class EspRenderer {
                     Marker marker = markerFor(state, pos.getX(), pos.getY(), pos.getZ());
                     if (marker == null) continue;
                     long key = BlockPos.asLong(pos.getX(), pos.getY(), pos.getZ());
-                    boolean exists = false;
-                    for (Marker old : SCANNED) {
-                        if (old.key == key) { exists = true; break; }
-                    }
-                    if (!exists && SCANNED.size() < MAX_MARKERS) SCANNED.add(marker);
+                    if (SCANNED.size() < MAX_MARKERS && SCANNED_KEYS.add(key)) SCANNED.add(marker);
                 }
             }
+        }
         }
     }
 
@@ -139,7 +142,7 @@ public final class EspRenderer {
         return module != null && module.isEnabled();
     }
 
-    private static void rebuildSections(ClientLevel level, int centerX, int centerZ, int radius) {
+    private static void rebuildSections(ClientLevel level, int centerX, int centerZ, int radius, int centerSectionY) {
         SECTIONS.clear();
         int minSection = level.getMinSectionY();
         int maxSection = level.getMaxSectionY();
@@ -147,8 +150,16 @@ public final class EspRenderer {
             for (int dx = -ring; dx <= ring; dx++) {
                 for (int dz = -ring; dz <= ring; dz++) {
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
-                    for (int sy = minSection; sy < maxSection; sy++) {
-                        SECTIONS.add(new Section(centerX + dx, sy, centerZ + dz));
+                    // Visit the player's current height first, then expand vertically.
+                    for (int offset = 0; offset < Math.max(centerSectionY - minSection, maxSection - centerSectionY); offset++) {
+                        int lower = centerSectionY - offset;
+                        int upper = centerSectionY + offset;
+                        if (lower >= minSection && lower < maxSection) {
+                            SECTIONS.add(new Section(centerX + dx, lower, centerZ + dz));
+                        }
+                        if (offset > 0 && upper >= minSection && upper < maxSection) {
+                            SECTIONS.add(new Section(centerX + dx, upper, centerZ + dz));
+                        }
                     }
                 }
             }
@@ -305,6 +316,7 @@ public final class EspRenderer {
     private static void reset(ClientLevel level) {
         lastLevel = level;
         SCANNED.clear();
+        SCANNED_KEYS.clear();
         SECTIONS.clear();
         frameMarkers = List.of();
         sectionCursor = 0;
