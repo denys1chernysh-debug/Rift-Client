@@ -19,7 +19,8 @@ public final class DonutScanner {
     public enum Scan { SUSPICIOUS, BASES, AMETHYST, DEBRIS }
     private static final Map<Scan, ScanState> STATES = new EnumMap<>(Scan.class);
     private static ClientLevel lastLevel;
-    private DonutScanner() { for (Scan scan : Scan.values()) STATES.put(scan, new ScanState()); }
+    static { for (Scan scan : Scan.values()) STATES.put(scan, new ScanState()); }
+    private DonutScanner() {}
 
     public static void tick(Scan scan) {
         Minecraft mc = Minecraft.getInstance();
@@ -47,6 +48,7 @@ public final class DonutScanner {
             return;
         }
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        if (!level.hasChunk(cx, cz)) return;
         int minY = level.getMinY();
         int maxY = level.getMaxY();
         int storage = 0, utility = 0, amethyst = 0, debris = 0;
@@ -55,7 +57,6 @@ public final class DonutScanner {
                 int wx = (cx << 4) + x, wz = (cz << 4) + z;
                 for (int y = minY; y < maxY; y++) {
                     pos.set(wx, y, wz);
-                    if (!level.hasChunkAt(pos)) continue;
                     BlockState state = level.getBlockState(pos);
                     if (state.is(Blocks.CHEST) || state.is(Blocks.TRAPPED_CHEST)
                         || state.is(Blocks.BARREL) || state.is(Blocks.ENDER_CHEST)
