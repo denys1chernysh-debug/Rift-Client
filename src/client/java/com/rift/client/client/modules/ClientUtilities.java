@@ -18,6 +18,12 @@ public final class ClientUtilities {
 
     public static void refreshAntiBot() { antiBot = true; }
     public static boolean isAntiBotEnabled() { return antiBot; }
+    public static boolean isLikelyBot(String name) {
+        if (name == null || name.isBlank()) return true;
+        String value = name.toLowerCase(Locale.ROOT);
+        return value.startsWith("npc") || value.startsWith("bot") || value.contains("[npc]")
+            || value.contains("dummy") || value.equals("shop") || value.equals("trader");
+    }
     public static boolean isFriend(String name) { load(); return FRIENDS.contains(name.toLowerCase(Locale.ROOT)); }
 
     public static void toggleFriend(String name) {
