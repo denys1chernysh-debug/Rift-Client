@@ -202,7 +202,7 @@ public class RiftScreen extends Screen {
 
         int gridX = mainX;
         int gridY = 124;
-        int gap = 7;
+        int gap = 8;
         int cardW = 282;
         int cardH = 49;
         int rowsVisible = 5;
