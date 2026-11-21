@@ -8,6 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
 
 public final class RiftHud {
     private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -35,6 +37,29 @@ public final class RiftHud {
                     player.getDeltaMovement().x * player.getDeltaMovement().x
                     + player.getDeltaMovement().z * player.getDeltaMovement().z));
                 case "Combat HUD" -> "RIFT  COMBAT HUD";
+                case "Totem Status" -> "TOTEMS  " + player.getInventory().countItem(Items.TOTEM_OF_UNDYING);
+                case "Crystal Status" -> "CRYSTALS  " + player.getInventory().countItem(Items.END_CRYSTAL);
+                case "Anchor Status" -> "ANCHORS  " + player.getInventory().countItem(Items.RESPAWN_ANCHOR);
+                case "Mace Status" -> "MACE  " + player.getInventory().countItem(Items.MACE)
+                    + "  |  WIND CHARGES  " + player.getInventory().countItem(Items.WIND_CHARGE);
+                case "Cart Status" -> "MINECARTS  " + player.getInventory().countItem(Items.MINECART);
+                case "Statistics" -> "LEVEL  " + player.experienceLevel + "  |  HEALTH  "
+                    + String.format("%.1f", player.getHealth());
+                case "Donut HUD" -> "DONUT  XYZ " + player.getBlockX() + " / " + player.getBlockY()
+                    + " / " + player.getBlockZ() + "  |  TOTEMS "
+                    + player.getInventory().countItem(Items.TOTEM_OF_UNDYING);
+                case "Live Player Finder" -> "VISIBLE PLAYERS  " + mc.level.players().size();
+                case "Inventory Display" -> "INVENTORY  TOTEMS "
+                    + player.getInventory().countItem(Items.TOTEM_OF_UNDYING)
+                    + "  |  PEARLS " + player.getInventory().countItem(Items.ENDER_PEARL)
+                    + "  |  XP " + player.getInventory().countItem(Items.EXPERIENCE_BOTTLE);
+                case "Cooldown HUD" -> "ATTACK COOLDOWN  "
+                    + Math.round(player.getAttackStrengthScale(0.0F) * 100) + "%";
+                case "Armor Status" -> {
+                    int equipped = 0;
+                    for (ItemStack stack : player.getArmorSlots()) if (!stack.isEmpty()) equipped++;
+                    yield "ARMOR  " + equipped + "/4 PIECES EQUIPPED";
+                }
                 default -> null;
             };
             if (value == null) continue;
