@@ -134,7 +134,6 @@ public class RiftScreen extends Screen {
 
         int mainX = SIDEBAR_W + 18;
         int mainRight = BASE_W - 18;
-        // Top search field
         boolean searchHover = mx >= mainX && mx <= 455 && my >= 18 && my <= 48;
         RiftTheme.panel(g, sx(mainX, x, scaleX), sy(18, y, scaleY),
             Math.round(286 * scaleX), Math.round(30 * scaleY), searchFocused || searchHover);
@@ -144,7 +143,6 @@ public class RiftScreen extends Screen {
             search.isEmpty() ? RiftTheme.GRAY : RiftTheme.WHITE);
         if (!search.isEmpty()) RiftTheme.text(g, minecraft.font, "×", sx(mainX + 268, x, scaleX), sy(27, y, scaleY), RiftTheme.WHITE);
 
-        // Profile and settings controls
         int profileX = 574;
         RiftTheme.panel(g, sx(profileX, x, scaleX), sy(18, y, scaleY), Math.round(112 * scaleX), Math.round(30 * scaleY), profileMenu);
         g.fill(sx(profileX + 5, x, scaleX), sy(22, y, scaleY), sx(profileX + 25, x, scaleX), sy(44, y, scaleY), 0xFF8432D6);
@@ -207,7 +205,6 @@ public class RiftScreen extends Screen {
                 sx(gridX + 18, x, scaleX), sy(gridY + 55, y, scaleY), RiftTheme.GRAY);
         }
 
-        // Fixed bottom action bar
         g.fill(x + Math.round(1 * scaleX), sy(385, y, scaleY), x + windowW - 1, y + windowH - 1, 0xFF10091C);
         g.fill(x + Math.round(SIDEBAR_W * scaleX), sy(385, y, scaleY), x + windowW - 1, sy(386, y, scaleY), 0xFF2C1A40);
         RiftTheme.panel(g, sx(mainX, x, scaleX), sy(394, y, scaleY), Math.round(220 * scaleX), Math.round(34 * scaleY), false);
@@ -276,8 +273,8 @@ public class RiftScreen extends Screen {
         int y = (height - windowH) / 2;
         float scaleX = windowW / (float) BASE_W;
         float scaleY = windowH / (float) BASE_H;
-        int mx = Math.round((event.x() - x) / scaleX);
-        int my = Math.round((event.y() - y) / scaleY);
+        int mx = (int) Math.round((event.x() - x) / scaleX);
+        int my = (int) Math.round((event.y() - y) / scaleY);
 
         for (int i = 0; i < RiftSidebar.CATEGORIES.length; i++) {
             int itemY = 72 + i * 39;
