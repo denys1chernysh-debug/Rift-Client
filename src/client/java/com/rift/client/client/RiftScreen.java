@@ -69,6 +69,18 @@ public class RiftScreen extends Screen {
                 try (var input = Files.newInputStream(path)) { properties.load(input); }
             }
             profile = properties.getProperty("profile", "Default");
+            EspSettings.setRange("Player ESP", readInt(properties, "esp.player.range", 256));
+            EspSettings.setRange("Storage ESP", readInt(properties, "esp.storage.range", 256));
+            EspSettings.setRange("Block ESP", readInt(properties, "esp.block.range", 256));
+            EspSettings.setThroughWalls(Boolean.parseBoolean(properties.getProperty("esp.throughWalls", "true")));
+            EspSettings.setShowStorageChests(Boolean.parseBoolean(properties.getProperty("esp.storage.chests", "true")));
+            EspSettings.setShowStorageBarrels(Boolean.parseBoolean(properties.getProperty("esp.storage.barrels", "true")));
+            EspSettings.setShowStorageShulkers(Boolean.parseBoolean(properties.getProperty("esp.storage.shulkers", "true")));
+            EspSettings.setShowStorageOther(Boolean.parseBoolean(properties.getProperty("esp.storage.other", "true")));
+            EspSettings.setShowBlockObsidian(Boolean.parseBoolean(properties.getProperty("esp.blocks.obsidian", "true")));
+            EspSettings.setShowBlockBeacons(Boolean.parseBoolean(properties.getProperty("esp.blocks.beacons", "true")));
+            EspSettings.setShowBlockPistons(Boolean.parseBoolean(properties.getProperty("esp.blocks.pistons", "true")));
+            EspSettings.setShowBlockOther(Boolean.parseBoolean(properties.getProperty("esp.blocks.other", "true")));
             for (Module module : ModuleManager.getModules()) {
                 String key = moduleKey(module);
                 module.setPinned(Boolean.parseBoolean(properties.getProperty(key + ".pinned", "false")));
@@ -86,6 +98,18 @@ public class RiftScreen extends Screen {
     private void saveProfile() {
         Properties properties = new Properties();
         properties.setProperty("profile", profile);
+        properties.setProperty("esp.player.range", Integer.toString(EspSettings.getRange("Player ESP")));
+        properties.setProperty("esp.storage.range", Integer.toString(EspSettings.getRange("Storage ESP")));
+        properties.setProperty("esp.block.range", Integer.toString(EspSettings.getRange("Block ESP")));
+        properties.setProperty("esp.throughWalls", Boolean.toString(EspSettings.isThroughWalls()));
+        properties.setProperty("esp.storage.chests", Boolean.toString(EspSettings.showStorageChests()));
+        properties.setProperty("esp.storage.barrels", Boolean.toString(EspSettings.showStorageBarrels()));
+        properties.setProperty("esp.storage.shulkers", Boolean.toString(EspSettings.showStorageShulkers()));
+        properties.setProperty("esp.storage.other", Boolean.toString(EspSettings.showStorageOther()));
+        properties.setProperty("esp.blocks.obsidian", Boolean.toString(EspSettings.showBlockObsidian()));
+        properties.setProperty("esp.blocks.beacons", Boolean.toString(EspSettings.showBlockBeacons()));
+        properties.setProperty("esp.blocks.pistons", Boolean.toString(EspSettings.showBlockPistons()));
+        properties.setProperty("esp.blocks.other", Boolean.toString(EspSettings.showBlockOther()));
         for (Module module : ModuleManager.getModules()) {
             String key = moduleKey(module);
             properties.setProperty(key + ".pinned", Boolean.toString(module.isPinned()));
@@ -98,6 +122,11 @@ public class RiftScreen extends Screen {
                 properties.store(output, "RIFT client settings");
             }
         } catch (IOException ignored) {}
+    }
+
+    private int readInt(Properties properties, String key, int fallback) {
+        try { return Integer.parseInt(properties.getProperty(key, Integer.toString(fallback))); }
+        catch (NumberFormatException ignored) { return fallback; }
     }
 
     private void resetSettings() {
