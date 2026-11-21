@@ -1,69 +1,91 @@
-
 package com.rift.client.client.modules;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 
-public class BasicModules {
+public final class BasicModules {
+    private static boolean registered;
 
-    private static boolean registered = false;
+    private BasicModules() {}
 
     public static void register() {
         if (registered) return;
         registered = true;
 
-        ModuleManager.register(new Module(
-            "Coordinates",
-            "Displays your current coordinates",
-            "Misc"
-        ) {
-            @Override
-            public void onTick() {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.player == null) return;
-
-                // Coordinates are read by the HUD.
-            }
-        });
-
-        ModuleManager.register(new Module(
-            "FPS Display",
-            "Displays your current FPS",
-            "Render"
-        ));
-
-        ModuleManager.register(new Module(
-            "Sprint",
-            "Automatically keeps sprint active",
-            "Player"
-        ) {
-            @Override
-            public void onTick() {
+        ModuleManager.register(new Module("Sprint", "Automatically sprints while you play.", "Player") {
+            @Override public void onTick() {
                 Minecraft mc = Minecraft.getInstance();
                 LocalPlayer player = mc.player;
-
-                if (player != null && player.input != null) {
-                    player.setSprinting(true);
-                }
+                if (player != null && player.input != null) player.setSprinting(true);
+            }
+            @Override public void onDisable() {
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (player != null) player.setSprinting(false);
             }
         });
 
-        ModuleManager.register(new Module(
-            "Particle Reducer",
-            "Reduces visual particle effects",
-            "Render"
-        ));
+        add("Coordinates", "Shows your current XYZ coordinates.", "Misc", true);
+        add("FPS Display", "Shows the current frame rate.", "Render", true);
+        add("Chunk Information", "Shows the chunk you are standing in.", "Donut", true);
+        add("Totem Counter", "Counts totems in your inventory.", "Combat", true);
+        add("Clock", "Displays your local time.", "Misc", true);
+        add("Movement HUD", "Displays movement information.", "Player", true);
+        add("Combat HUD", "Displays a compact combat status panel.", "Combat", true);
+        add("Cooldown Display", "Displays item cooldown status.", "Combat", false);
+        add("Keystrokes", "Shows movement key states.", "Misc", false);
+        add("Ping Display", "Shows your connection latency.", "Misc", false);
+        add("Server Information", "Shows the current server name.", "Donut", false);
+        add("Statistics", "Shows session statistics.", "Donut", false);
+        add("Donut HUD", "Combines useful Donut SMP information.", "Donut", false);
 
-        ModuleManager.register(new Module(
-            "Chunk Information",
-            "Displays information about your current chunk",
-            "Donut"
-        ));
+        // Donut world-inspection tools requested for RIFT.
+        add("Sus Chunks", "Flags unusual terrain patterns in loaded chunks.", "Donut", false);
+        add("Chunk Finder", "Inspects loaded chunk information.", "Donut", false);
+        add("New Chunks", "Highlights recently generated chunk candidates.", "Donut", false);
+        add("Cave / Tunnel Finder", "Inspects nearby cave and tunnel geometry.", "Donut", false);
+        add("Storage ESP", "Highlights storage blocks in loaded areas.", "Render", false);
+        add("Block ESP", "Highlights selected block types.", "Render", false);
+        add("Amethyst Finder", "Finds amethyst geode candidates.", "Donut", false);
+        add("Ancient Debris Finder", "Finds ancient debris in visible loaded terrain.", "Donut", false);
+        add("Spawner / Trial Chamber Finder", "Finds nearby structure indicators.", "Donut", false);
+        add("Sound Detector", "Displays nearby in-game sound events.", "Donut", false);
+        add("Portal / Beacon Tracer", "Marks visible portals and beacons.", "Render", false);
+        add("Player ESP", "Adds visual markers for visible players.", "Render", false);
+        add("Entity ESP", "Adds visual markers for selected entities.", "Render", false);
+        add("Target Renderer", "Displays a selected entity information panel.", "Render", false);
+        add("Friends List", "Stores names you mark as friends.", "Client", false);
+        add("Anti-Bot", "Filters suspicious entity entries from client displays.", "Render", false);
 
-        ModuleManager.register(new Module(
-            "Totem Counter",
-            "Displays your carried totems",
-            "Combat"
-        ));
+        // Player and quality-of-life entries.
+        add("Auto Tool", "Selects a suitable hotbar tool.", "Player", false);
+        add("Scaffold", "Assisted block placement mode.", "Player", false);
+        add("Bridge Assist", "Assists with careful bridging.", "Player", false);
+        add("Safe Walk", "Helps prevent accidental edge movement.", "Player", false);
+        add("Auto Jump Reset", "Movement timing helper.", "Player", false);
+        add("No Jump Delay", "Adjusts local jump timing.", "Player", false);
+        add("Auto XP", "Experience bottle inventory helper.", "Player", false);
+        add("Fast Place", "Placement convenience setting.", "Player", false);
+        add("Item Culler", "Reduces dropped-item rendering.", "Render", false);
+        add("Particle Reducer", "Reduces visual particle effects.", "Render", false);
+        add("Low Animations", "Reduces selected interface animations.", "Render", false);
+        add("Inventory HUD", "Displays a compact inventory panel.", "Render", false);
+        add("Armor HUD", "Displays equipped armor and durability.", "Render", false);
+        add("Potion HUD", "Displays active status effects.", "Render", false);
+        add("Notifications", "Displays RIFT status notifications.", "Client", false);
+        add("Profiles", "Stores named module configurations.", "Client", false);
+        add("HUD Editor", "Customize the position of HUD elements.", "Client", false);
+        add("Custom Theme", "Customize the RIFT color palette.", "Client", false);
+        add("Module Search", "Search the module registry.", "Client", false);
+        add("Freecam", "Local camera exploration mode.", "Player", false);
+        add("Trajectories", "Visualizes projectile paths.", "Render", false);
+        add("Dropped Item Visibility", "Controls dropped-item visibility.", "Render", false);
+        add("Screenshot Manager", "Organizes screenshots from your session.", "Misc", false);
+        add("Inventory Display", "Displays inventory contents.", "Misc", false);
+        add("Personal Statistics", "Displays personal session statistics.", "Donut", false);
+        add("Custom Donut Profile", "A dedicated Donut SMP configuration.", "Donut", false);
+    }
+
+    private static void add(String name, String description, String category, boolean implemented) {
+        ModuleManager.register(new Module(name, description, category, implemented));
     }
 }
