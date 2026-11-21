@@ -40,6 +40,9 @@ public final class BasicModules {
         add("Ancient Debris Finder", "Find ancient debris in loaded terrain.", "Donut", false);
         add("Spawner / Trial Chamber Finder", "Inspect nearby structure indicators.", "Donut", false);
         add("Live Player Finder", "Show the number of players currently visible in your world.", "Donut", true);
+        ModuleManager.register(new Module("Storage Scanner", "Scan already-loaded nearby chunks for storage blocks and list their coordinates.", "Donut") {
+            @Override public void onTick() { StorageScanner.tick(); }
+        });
         add("Sound Detector", "Display nearby in-game sound events.", "Donut", false);
         add("Server Information", "Show current server details.", "Donut", false);
         add("Statistics", "Display your XP level and health.", "Donut", true);
