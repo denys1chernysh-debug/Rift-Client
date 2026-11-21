@@ -141,8 +141,8 @@ public final class EspRenderer {
 
     private static void rebuildSections(ClientLevel level, int centerX, int centerZ, int radius) {
         SECTIONS.clear();
-        int minSection = level.getMinSection();
-        int maxSection = level.getMaxSection();
+        int minSection = level.getMinSectionY();
+        int maxSection = level.getMaxSectionY();
         for (int ring = 0; ring <= radius; ring++) {
             for (int dx = -ring; dx <= ring; dx++) {
                 for (int dz = -ring; dz <= ring; dz++) {
@@ -249,10 +249,10 @@ public final class EspRenderer {
                 case STORAGE -> { r = 0.68f; g = 0.34f; b = 0.95f; a = 0.32f; }
                 default -> { r = 0.35f; g = 0.70f; b = 1.00f; a = 0.25f; }
             }
-            float minX = marker.x, minY = marker.y, minZ = marker.z;
-            float maxX = marker.kind == Kind.PLAYER ? marker.maxX : marker.x + 1;
-            float maxY = marker.kind == Kind.PLAYER ? marker.maxY : marker.y + 1;
-            float maxZ = marker.kind == Kind.PLAYER ? marker.maxZ : marker.z + 1;
+            float minX = (float) marker.x, minY = (float) marker.y, minZ = (float) marker.z;
+            float maxX = (float) (marker.kind == Kind.PLAYER ? marker.maxX : marker.x + 1);
+            float maxY = (float) (marker.kind == Kind.PLAYER ? marker.maxY : marker.y + 1);
+            float maxZ = (float) (marker.kind == Kind.PLAYER ? marker.maxZ : marker.z + 1);
             renderBox(pose.last().pose(), builder, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a);
         }
         pose.popPose();
