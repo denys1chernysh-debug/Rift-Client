@@ -11,7 +11,6 @@ import net.minecraft.client.player.LocalPlayer;
 
 public final class RiftHud {
     private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm:ss");
-
     private RiftHud() {}
 
     public static void extract(GuiGraphicsExtractor graphics, net.minecraft.client.DeltaTracker delta) {
@@ -20,8 +19,7 @@ public final class RiftHud {
         if (player == null || mc.gui.screen() != null) return;
 
         Font font = mc.font;
-        int x = 10;
-        int y = 10;
+        int x = 10, y = 10;
         int line = 13;
 
         for (Module module : ModuleManager.getModules()) {
@@ -30,13 +28,10 @@ public final class RiftHud {
                 case "Coordinates" -> String.format("XYZ  %.1f / %.1f / %.1f",
                     player.getX(), player.getY(), player.getZ());
                 case "FPS Display" -> "FPS  " + mc.getFps();
-                case "Chunk Information" -> {
-                    var chunk = player.chunkPosition();
-                    yield "CHUNK  " + chunk.x + " / " + chunk.z;
-                }
+                case "Chunk Information" -> "CHUNK  " + (player.getBlockX() >> 4) + " / " + (player.getBlockZ() >> 4);
                 case "Totem Counter" -> "TOTEMS  " + player.getInventory().countItem(net.minecraft.world.item.Items.TOTEM_OF_UNDYING);
                 case "Clock" -> "TIME  " + LocalTime.now().format(CLOCK);
-                case "Movement HUD" -> String.format("SPEED  %.2f", Math.sqrt(
+                case "Movement HUD" -> "SPEED  " + String.format("%.2f", Math.sqrt(
                     player.getDeltaMovement().x * player.getDeltaMovement().x
                     + player.getDeltaMovement().z * player.getDeltaMovement().z));
                 case "Combat HUD" -> "RIFT  COMBAT HUD";
