@@ -24,8 +24,8 @@ import net.minecraft.network.chat.Component;
 
 public class RiftScreen extends Screen {
     private static final int BASE_W = 760;
-    private static final int BASE_H = 440;
-    private static final int SIDEBAR_W = 156;
+    private static final int BASE_H = 480;
+    private static final int SIDEBAR_W = 152;
 
     private int page;
     private int scroll;
@@ -209,7 +209,7 @@ public class RiftScreen extends Screen {
         int gap = 7;
         int cardW = 282;
         int cardH = 43;
-        int rowsVisible = 5;
+        int rowsVisible = 6;
         int perPage = rowsVisible * 2;
         int maxScroll = Math.max(0, modules.size() - perPage);
         scroll = Math.max(0, Math.min(scroll, maxScroll));
@@ -243,17 +243,17 @@ public class RiftScreen extends Screen {
                 sx(gridX + 18, x, scaleX), sy(gridY + 55, y, scaleY), RiftTheme.GRAY);
         }
 
-        g.fill(x + Math.round(1 * scaleX), sy(385, y, scaleY), x + windowW - 1, y + windowH - 1, 0xFF10091C);
-        g.fill(x + Math.round(SIDEBAR_W * scaleX), sy(385, y, scaleY), x + windowW - 1, sy(386, y, scaleY), 0xFF2C1A40);
-        RiftTheme.panel(g, sx(mainX, x, scaleX), sy(394, y, scaleY), Math.round(220 * scaleX), Math.round(34 * scaleY), false);
+        g.fill(x + Math.round(1 * scaleX), sy(425, y, scaleY), x + windowW - 1, y + windowH - 1, 0xFF10091C);
+        g.fill(x + Math.round(SIDEBAR_W * scaleX), sy(425, y, scaleY), x + windowW - 1, sy(426, y, scaleY), 0xFF2C1A40);
+        RiftTheme.panel(g, sx(mainX, x, scaleX), sy(434, y, scaleY), Math.round(220 * scaleX), Math.round(34 * scaleY), false);
         RiftTheme.text(g, minecraft.font, "↶  Reset Settings",
-            sx(mainX + 77, x, scaleX), sy(407, y, scaleY), RiftTheme.GRAY);
+            sx(mainX + 77, x, scaleX), sy(447, y, scaleY), RiftTheme.GRAY);
         RiftTheme.text(g, minecraft.font, "C H A N G E S   A P P L Y   I N S T A N T L Y",
             sx(406, x, scaleX), sy(408, y, scaleY), RiftTheme.MUTED);
-        g.fill(sx(540, x, scaleX), sy(394, y, scaleY), sx(742, x, scaleX), sy(428, y, scaleY), 0xFF35175B);
-        g.outline(sx(540, x, scaleX), sy(394, y, scaleY), Math.round(202 * scaleX), Math.round(34 * scaleY), 0xFF67339A);
+        g.fill(sx(540, x, scaleX), sy(434, y, scaleY), sx(742, x, scaleX), sy(468, y, scaleY), 0xFF35175B);
+        g.outline(sx(540, x, scaleX), sy(434, y, scaleY), Math.round(202 * scaleX), Math.round(34 * scaleY), 0xFF67339A);
         RiftTheme.text(g, minecraft.font, "↓  Save Settings",
-            sx(601, x, scaleX), sy(407, y, scaleY), RiftTheme.WHITE);
+            sx(601, x, scaleX), sy(447, y, scaleY), RiftTheme.WHITE);
 
         if (profileMenu) {
             int px = sx(profileX, x, scaleX);
@@ -462,12 +462,12 @@ public class RiftScreen extends Screen {
             return true;
         }
         if (settingsModule != null && mx >= 476 && mx <= 742 && my >= 235 && my <= 361) {
-            if (my >= 300 && my <= 328) settingsModule.setPinned(!settingsModule.isPinned());
+            if (my >= 300 && my <= 328) { settingsModule.setPinned(!settingsModule.isPinned()); saveProfile(); }
             else settingsModule = null;
             return true;
         }
 
-        if (my >= 394 && my <= 428) {
+        if (my >= 434 && my <= 468) {
             if (mx >= SIDEBAR_W + 18 && mx <= SIDEBAR_W + 238) {
                 resetSettings();
                 return true;
@@ -481,7 +481,7 @@ public class RiftScreen extends Screen {
         List<Module> modules = visibleModules();
         int gridY = 124, cardW = 282, cardH = 43, gap = 7;
         int gridX = SIDEBAR_W + 18;
-        int perPage = 10;
+        int perPage = 12;
         int shownCount = Math.min(perPage, Math.max(0, modules.size() - scroll));
         for (int i = 0; i < shownCount; i++) {
             int cardX = gridX + (i % 2) * (cardW + gap);
@@ -490,6 +490,7 @@ public class RiftScreen extends Screen {
             Module module = modules.get(scroll + i);
             if (mx >= cardX + cardW - 83 && mx < cardX + cardW - 62) {
                 module.setPinned(!module.isPinned());
+                saveProfile();
                 return true;
             }
             if (mx >= cardX + cardW - 63 && mx < cardX + cardW - 50) {
@@ -499,6 +500,7 @@ public class RiftScreen extends Screen {
             }
             if (mx >= cardX + cardW - 50) {
                 if (module.isImplemented()) module.toggle();
+                saveProfile();
                 settingsModule = module;
                 return true;
             }
@@ -507,6 +509,7 @@ public class RiftScreen extends Screen {
                 return true;
             }
             if (module.isImplemented()) module.toggle();
+            saveProfile();
             settingsModule = module;
             return true;
         }
@@ -540,7 +543,7 @@ public class RiftScreen extends Screen {
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
         if (mouseX >= x + SIDEBAR_W && mouseY >= y + 115 && mouseY <= y + 385) {
-            int max = Math.max(0, visibleModules().size() - 10);
+            int max = Math.max(0, visibleModules().size() - 12);
             scroll = Math.max(0, Math.min(max, scroll + (verticalAmount < 0 ? 2 : -2)));
             return true;
         }
