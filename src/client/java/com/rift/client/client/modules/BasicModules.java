@@ -88,7 +88,7 @@ public final class BasicModules {
     }
 
     private static void add(String name, String description, String category, boolean implemented) {
-        Module module = new Module(name, description, category) {};
+        Module module = new Module(name, description, category, implemented) {};
         if (!implemented) {
             module.setEnabled(false);
         }
