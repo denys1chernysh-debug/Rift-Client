@@ -2,6 +2,7 @@ package com.rift.client.client.ui;
 
 import com.rift.client.client.modules.Module;
 import com.rift.client.client.modules.ModuleManager;
+import com.rift.client.client.modules.StorageScanner;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import net.minecraft.client.Minecraft;
@@ -50,6 +51,7 @@ public final class RiftHud {
                     + " / " + player.getBlockZ() + "  |  TOTEMS "
                     + player.getInventory().countItem(Items.TOTEM_OF_UNDYING);
                 case "Live Player Finder" -> "VISIBLE PLAYERS  " + mc.level.players().size();
+                case "Storage Scanner" -> StorageScanner.getSummary() + (StorageScanner.getFound().isEmpty() ? "" : "  |  " + String.join("  •  ", StorageScanner.getFound().stream().limit(3).toList()));
                 case "Inventory Display" -> "INVENTORY  TOTEMS "
                     + player.getInventory().countItem(Items.TOTEM_OF_UNDYING)
                     + "  |  PEARLS " + player.getInventory().countItem(Items.ENDER_PEARL)
