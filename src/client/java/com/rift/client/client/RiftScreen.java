@@ -542,7 +542,7 @@ public class RiftScreen extends Screen {
         int windowH = Math.min(BASE_H, height - 28);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        if (mouseX >= x + SIDEBAR_W && mouseY >= y + 115 && mouseY <= y + 385) {
+        if (mouseX >= x + SIDEBAR_W && mouseY >= y + 115 && mouseY <= y + 425) {
             int max = Math.max(0, visibleModules().size() - 12);
             scroll = Math.max(0, Math.min(max, scroll + (verticalAmount < 0 ? 2 : -2)));
             return true;
