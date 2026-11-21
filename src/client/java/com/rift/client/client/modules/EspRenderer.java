@@ -229,7 +229,7 @@ public final class EspRenderer {
     private static void render(LevelRenderContext context) {
         if (frameMarkers.isEmpty()) return;
         RenderPipeline pipeline = THROUGH_WALLS;
-        VertexFormat format = pipeline.getVertexFormat();
+        VertexFormat format = pipeline.getVertexFormatBinding(0);
         if (format == null) return;
 
         PrimitiveTopology topology = pipeline.getPrimitiveTopology();
