@@ -51,9 +51,9 @@ public final class BasicModules {
         add("Custom Donut Profile", "Dedicated Donut SMP module configuration.", "Donut", false);
 
         // Visual and render tools
-        add("Block ESP", "Highlight selected block types.", "Visuals", false);
-        add("Storage ESP", "Highlight storage blocks in loaded areas.", "Visuals", false);
-        add("Player ESP", "Add visual markers for visible players.", "Visuals", false);
+        add("Block ESP", "Highlight selected blocks in loaded chunks, including obsidian, beacons, and pistons.", "Visuals", true);
+        add("Storage ESP", "Highlight chests, barrels, shulkers, and other storage blocks in loaded chunks.", "Visuals", true);
+        add("Player ESP", "Render player boxes at long range, including through walls.", "Visuals", true);
         add("Entity ESP", "Add visual markers for selected entities.", "Visuals", false);
         add("Target Renderer", "Display information about a selected entity.", "Visuals", false);
         add("Portal / Beacon Tracer", "Mark visible portals and beacons.", "Visuals", false);
