@@ -18,7 +18,7 @@ public final class EspSettings {
     private static boolean blockBeacons = true;
     private static boolean blockPistons = true;
     private static boolean blockOther = true;
-    private static boolean throughWalls = true;
+    private static boolean throughWalls = false;
 
     private EspSettings() {}
 
