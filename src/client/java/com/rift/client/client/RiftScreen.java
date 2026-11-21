@@ -1,178 +1,85 @@
-
 package com.rift.client.client;
 
-import com.rift.client.client.ui.RiftTheme;
-import com.rift.client.client.ui.RiftSidebar;
+import com.rift.client.client.modules.Module;
+import com.rift.client.client.modules.ModuleManager;
 import com.rift.client.client.ui.RiftModuleCard;
-
-import net.minecraft.client.gui.screens.Screen;
+import com.rift.client.client.ui.RiftSidebar;
+import com.rift.client.client.ui.RiftTheme;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RiftScreen extends Screen {
-
     private int page = 0;
-    private int settingsModule = -1;
+    private Module settingsModule;
+    private static final int W = 720, H = 420;
 
-    private final String[][] modules = {
-        {"Combat HUD", "Cooldown Display", "Totem Counter"},
-        {"Sprint", "Movement HUD", "Inventory HUD"},
-        {"Item Culler", "Particle Reducer", "Low Animations", "FPS Display"},
-        {"Keystrokes", "Coordinates", "Ping Display", "Clock"},
-        {"Donut HUD", "Chunk Information", "Server Information", "Statistics"},
-        {"Custom Theme", "Notifications", "Profiles", "HUD Editor"},
-        {"FPS Display", "Coordinates", "Item Culler"}
-    };
+    public RiftScreen() { super(Component.literal("RIFT")); }
 
-    private final String[][] descriptions = {
-        {"Shows combat information", "Tracks ability cooldowns", "Displays totem count"},
-        {"Movement controls", "Shows movement stats", "Displays inventory"},
-        {"Reduces dropped item rendering", "Reduces visual particles", "Simplifies animations", "Shows frames per second"},
-        {"Displays keyboard presses", "Shows your coordinates", "Shows server ping", "Displays the clock"},
-        {"Donut server information HUD", "Displays chunk information", "Shows server details", "Displays statistics"},
-        {"Change the client theme", "Client alerts", "Manage profiles", "Edit HUD layout"},
-        {"Shows frames per second", "Shows your coordinates", "Reduces item rendering"}
-    };
-
-    private final boolean[][] enabled = new boolean[7][10];
-
-    private final String[] categories = {
-        "Combat", "Player", "Render", "Misc",
-        "Donut", "Client", "Favorites"
-    };
-
-    public RiftScreen() {
-        super(Component.literal("RIFT"));
+    private List<Module> visibleModules() {
+        List<Module> result = new ArrayList<>();
+        for (Module m : ModuleManager.getModules()) {
+            if (page == 6 ? m.isPinned() : m.getCategory().equalsIgnoreCase(RiftSidebar.CATEGORIES[page])) result.add(m);
+        }
+        return result;
     }
 
     @Override
-    public void extractRenderState(
-        GuiGraphicsExtractor g,
-        int mouseX,
-        int mouseY,
-        float delta
-    ) {
+    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractRenderState(g, mouseX, mouseY, delta);
+        int x = (width-W)/2, y = (height-H)/2;
+        g.fill(0,0,width,height,0xDD05030A);
+        g.fill(x,y,x+W,y+H,RiftTheme.BACKGROUND);
+        g.outline(x,y,W,H,RiftTheme.PURPLE);
+        RiftSidebar.render(g,minecraft.font,x,y,page);
+        RiftTheme.text(g,minecraft.font,RiftSidebar.CATEGORIES[page],x+175,y+22,RiftTheme.WHITE);
+        RiftTheme.text(g,minecraft.font,"Manage your RIFT modules",x+175,y+42,RiftTheme.GRAY);
+        RiftTheme.panel(g,x+175,y+65,515,27,false);
+        RiftTheme.text(g,minecraft.font,"Search modules — coming soon",x+188,y+75,RiftTheme.GRAY);
 
-        int x = (width - 720) / 2;
-        int y = (height - 420) / 2;
-
-        g.fill(0, 0, width, height, 0xDD05030A);
-
-        g.fill(x, y, x + 720, y + 420, RiftTheme.BACKGROUND);
-        g.outline(x, y, 720, 420, RiftTheme.PURPLE);
-
-        RiftSidebar.render(g, minecraft.font, x, y, page);
-
-        RiftTheme.text(g, minecraft.font, categories[page],
-            x + 175, y + 22, RiftTheme.WHITE);
-
-        RiftTheme.text(g, minecraft.font, "Manage your RIFT modules",
-            x + 175, y + 42, RiftTheme.GRAY);
-
-        RiftTheme.panel(g, x + 175, y + 65, 515, 27, false);
-
-        RiftTheme.text(g, minecraft.font, "Search modules...",
-            x + 188, y + 75, RiftTheme.GRAY);
-
-        for (int i = 0; i < modules[page].length; i++) {
-
-            int col = i % 2;
-            int row = i / 2;
-
-            int cardX = x + 175 + col * 260;
-            int cardY = y + 110 + row * 65;
-
-            boolean hovered =
-                mouseX >= cardX && mouseX <= cardX + 235 &&
-                mouseY >= cardY && mouseY <= cardY + 65;
-
-            RiftModuleCard.render(
-                g,
-                minecraft.font,
-                cardX,
-                cardY,
-                modules[page][i],
-                descriptions[page][i],
-                enabled[page][i],
-                hovered
-            );
+        List<Module> modules=visibleModules();
+        if(modules.isEmpty()) RiftTheme.text(g,minecraft.font,"No modules in this category yet",x+190,y+135,RiftTheme.GRAY);
+        for(int i=0;i<modules.size();i++){
+            Module m=modules.get(i);
+            int cx=x+175+(i%2)*260, cy=y+110+(i/2)*72;
+            boolean hover=mouseX>=cx&&mouseX<=cx+235&&mouseY>=cy&&mouseY<=cy+65;
+            RiftModuleCard.render(g,minecraft.font,cx,cy,m.getName(),m.getDescription(),m.isEnabled(),hover);
+            if(m.isPinned()) RiftTheme.text(g,minecraft.font,"★",cx+215,cy+5,RiftTheme.PURPLE);
         }
-
-        if (settingsModule >= 0) {
-
-            RiftTheme.panel(g, x + 175, y + 310, 515, 75, true);
-
-            RiftTheme.text(g, minecraft.font, "MODULE SETTINGS",
-                x + 190, y + 325, RiftTheme.PURPLE);
-
-            RiftTheme.text(g, minecraft.font,
-                modules[page][settingsModule],
-                x + 190, y + 345, RiftTheme.WHITE);
-
-            RiftTheme.text(g, minecraft.font,
-                "Configuration options coming next",
-                x + 190, y + 363, RiftTheme.GRAY);
+        if(settingsModule!=null){
+            RiftTheme.panel(g,x+175,y+310,515,75,true);
+            RiftTheme.text(g,minecraft.font,"MODULE",x+190,y+325,RiftTheme.PURPLE);
+            RiftTheme.text(g,minecraft.font,settingsModule.getName(),x+190,y+345,RiftTheme.WHITE);
+            RiftTheme.text(g,minecraft.font,"Right-click its card to pin or unpin it",x+190,y+363,RiftTheme.GRAY);
         }
-
-        RiftTheme.text(g, minecraft.font, "RIFT CLIENT  |  1.0.0",
-            x + 175, y + 400, RiftTheme.GRAY);
+        RiftTheme.text(g,minecraft.font,"RIFT CLIENT  |  1.0.0",x+175,y+400,RiftTheme.GRAY);
     }
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-
-        double mouseX = event.x();
-        double mouseY = event.y();
-
-        if (event.button() != 0) {
-            return super.mouseClicked(event, doubleClick);
+        double mx=event.x(), my=event.y();
+        int x=(width-W)/2, y=(height-H)/2;
+        for(int i=0;i<RiftSidebar.CATEGORIES.length;i++){
+            int iy=y+72+i*43;
+            if(mx>=x+9&&mx<=x+145&&my>=iy-8&&my<=iy+20){page=i;settingsModule=null;return true;}
         }
-
-        int x = (width - 720) / 2;
-        int y = (height - 420) / 2;
-
-        for (int i = 0; i < categories.length; i++) {
-
-            int itemY = y + 70 + i * 39;
-
-            if (mouseX >= x + 9 && mouseX <= x + 140 &&
-                mouseY >= itemY - 7 && mouseY <= itemY + 19) {
-
-                page = i;
-                settingsModule = -1;
-                return true;
-            }
-        }
-
-        for (int i = 0; i < modules[page].length; i++) {
-
-            int col = i % 2;
-            int row = i / 2;
-
-            int cardX = x + 175 + col * 260;
-            int cardY = y + 110 + row * 65;
-
-            if (mouseX >= cardX && mouseX <= cardX + 235 &&
-                mouseY >= cardY && mouseY <= cardY + 65) {
-
-                if (mouseX >= cardX + 180) {
-                    settingsModule = i;
-                } else {
-                    enabled[page][i] = !enabled[page][i];
-                    settingsModule = -1;
+        List<Module> modules=visibleModules();
+        for(int i=0;i<modules.size();i++){
+            int cx=x+175+(i%2)*260, cy=y+110+(i/2)*72;
+            if(mx>=cx&&mx<=cx+235&&my>=cy&&my<=cy+65){
+                Module m=modules.get(i);
+                if(event.button()==1){m.setPinned(!m.isPinned());settingsModule=m;return true;}
+                if(event.button()==0){
+                    if(mx>=cx+180) settingsModule=m;
+                    else {m.toggle();settingsModule=null;}
+                    return true;
                 }
-
-                return true;
             }
         }
-
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(event,doubleClick);
     }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
+    @Override public boolean isPauseScreen(){return false;}
 }
