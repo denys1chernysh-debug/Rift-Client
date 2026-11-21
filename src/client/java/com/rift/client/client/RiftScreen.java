@@ -152,8 +152,8 @@ public class RiftScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractRenderState(g, mouseX, mouseY, delta);
-        int windowW = Math.min(BASE_W, width - 28);
-        int windowH = Math.min(BASE_H, height - 28);
+        int windowW = Math.min(1200, width - 28);
+        int windowH = Math.min(760, height - 28);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
         float scaleX = windowW / (float) BASE_W;
@@ -380,8 +380,8 @@ public class RiftScreen extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int windowW = Math.min(BASE_W, width - 28);
-        int windowH = Math.min(BASE_H, height - 28);
+        int windowW = Math.min(1200, width - 28);
+        int windowH = Math.min(760, height - 28);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
         float scaleX = windowW / (float) BASE_W;
@@ -538,11 +538,16 @@ public class RiftScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        int windowW = Math.min(BASE_W, width - 28);
-        int windowH = Math.min(BASE_H, height - 28);
+        int windowW = Math.min(1200, width - 28);
+        int windowH = Math.min(760, height - 28);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        if (mouseX >= x + SIDEBAR_W && mouseY >= y + 115 && mouseY <= y + 425) {
+        float scaleX = windowW / (float) BASE_W;
+        float scaleY = windowH / (float) BASE_H;
+        int contentLeft = x + Math.round(SIDEBAR_W * scaleX);
+        int contentTop = y + Math.round(115 * scaleY);
+        int contentBottom = y + Math.round(425 * scaleY);
+        if (mouseX >= contentLeft && mouseY >= contentTop && mouseY <= contentBottom) {
             int max = Math.max(0, visibleModules().size() - 12);
             scroll = Math.max(0, Math.min(max, scroll + (verticalAmount < 0 ? 2 : -2)));
             return true;
