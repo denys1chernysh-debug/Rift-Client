@@ -13,8 +13,7 @@ public final class RiftModuleCard {
     ) {
         int background = hovered ? 0xFF1D1930 : RiftTheme.PANEL;
         int border = hovered ? 0xFF493765 : RiftTheme.BORDER;
-        g.fill(x, y, x + width, y + height, background);
-        g.outline(x, y, width, height, border);
+        RiftTheme.roundedPanel(g, x, y, width, height, 8, background, border);
         if (enabledProgress > 0.02f) {
             g.fill(x, y + 7, x + 2, y + height - 7, RiftTheme.PURPLE_GLOW);
         }
@@ -32,8 +31,7 @@ public final class RiftModuleCard {
         if (implemented) {
             RiftTheme.toggle(g, x + width - 43, y + 13, enabledProgress);
         } else {
-            g.fill(x + width - 43, y + 13, x + width - 5, y + 33, 0xFF24202B);
-            g.outline(x + width - 43, y + 13, 38, 20, 0xFF403747);
+            RiftTheme.roundedPanel(g, x + width - 43, y + 13, 38, 20, 10, 0xFF24202B, 0xFF403747);
             RiftTheme.text(g, font, "—", x + width - 28, y + 19, RiftTheme.MUTED);
         }
     }
