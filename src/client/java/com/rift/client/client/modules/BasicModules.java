@@ -107,7 +107,28 @@ public final class BasicModules {
             }
         });
 
-        add("Bridge Assist", "Helps time safe sneaking while bridging.", "Player", false);
+        ModuleManager.register(new Module("Bridge Assist", "Automatically sneaks when your movement would carry you over an unsupported edge.", "Player") {
+            @Override public void onTick() {
+                Minecraft mc = Minecraft.getInstance();
+                LocalPlayer player = mc.player;
+                if (player == null || !player.isAlive() || !player.onGround() || player.input == null) return;
+                double dx = player.getDeltaMovement().x;
+                double dz = player.getDeltaMovement().z;
+                if (Math.abs(dx) + Math.abs(dz) < 0.015) {
+                    player.setShiftKeyDown(false);
+                    return;
+                }
+                double lead = 0.55;
+                BlockPos landing = BlockPos.containing(player.getX() + dx * lead,
+                    player.getY() - 1.0, player.getZ() + dz * lead);
+                boolean edge = mc.level != null && mc.level.getBlockState(landing).isAir();
+                player.setShiftKeyDown(edge || mc.options.keyShift.isDown());
+            }
+            @Override public void onDisable() {
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (player != null) player.setShiftKeyDown(false);
+            }
+        });
         ModuleManager.register(new Module("Auto Jump Reset", "Jumps when the player is taking damage to reset sprint knockback where supported.", "Player") {
             @Override public void onTick() {
                 LocalPlayer player = Minecraft.getInstance().player;
@@ -129,25 +150,106 @@ public final class BasicModules {
         add("Ancient Debris Finder", "Finds ancient debris in blocks already sent to the client.", "Donut", false);
 
         // Misc
-        ModuleManager.register(new Module("Auto XP", "Automatically throws experience bottles from the hotbar.", "Misc") {
+        ModuleManager.register(new Module("Auto XP", "Throws an XP bottle from your hotbar at a controlled interval.", "Misc") {
+            private int cooldown;
+            private int restoreSlot = -1;
+            private int restoreIn;
             @Override public void onTick() {
                 Minecraft mc = Minecraft.getInstance();
                 LocalPlayer player = mc.player;
                 if (player == null || mc.gameMode == null) return;
-                ItemStack held = player.getMainHandItem();
-                if (held.is(Items.EXPERIENCE_BOTTLE)) {
-                    mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
+                if (restoreIn > 0 && --restoreIn == 0 && restoreSlot >= 0) {
+                    player.getInventory().selected = restoreSlot;
+                    restoreSlot = -1;
                 }
+                if (cooldown > 0) { cooldown--; return; }
+                int bottleSlot = -1;
+                for (int slot = 0; slot < 9; slot++) {
+                    if (player.getInventory().getItem(slot).is(Items.EXPERIENCE_BOTTLE)) {
+                        bottleSlot = slot;
+                        break;
+                    }
+                }
+                if (bottleSlot < 0) return;
+                if (restoreSlot < 0) restoreSlot = player.getInventory().selected;
+                player.getInventory().selected = bottleSlot;
+                mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
+                restoreIn = 2;
+                cooldown = 4;
+            }
+            @Override public void onDisable() {
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (player != null && restoreSlot >= 0) player.getInventory().selected = restoreSlot;
+                restoreSlot = -1;
+                restoreIn = 0;
+                cooldown = 0;
             }
         });
-        add("Pearl Macro", "Switches to an ender pearl, uses it, then restores the previous slot.", "Misc", false);
-        add("Fast Place", "Reduces the delay between block placement actions.", "Misc", false);
+
+        ModuleManager.register(new Module("Pearl Macro", "On activation, throws one hotbar ender pearl and restores your selected slot.", "Misc") {
+            @Override public void onEnable() {
+                Minecraft mc = Minecraft.getInstance();
+                LocalPlayer player = mc.player;
+                if (player == null || mc.gameMode == null) { setEnabled(false); return; }
+                int oldSlot = player.getInventory().selected;
+                int pearlSlot = -1;
+                for (int slot = 0; slot < 9; slot++) {
+                    if (player.getInventory().getItem(slot).is(Items.ENDER_PEARL)) {
+                        pearlSlot = slot;
+                        break;
+                    }
+                }
+                if (pearlSlot >= 0) {
+                    player.getInventory().selected = pearlSlot;
+                    mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
+                    player.getInventory().selected = oldSlot;
+                }
+                setEnabled(false);
+            }
+        });
+
+        ModuleManager.register(new Module("Fast Place", "Removes the vanilla right-click placement delay when the game exposes that timer.", "Misc") {
+            private Field delayField;
+            private Object gameMode;
+            private int originalDelay = -1;
+            @Override public void onTick() {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.gameMode == null) return;
+                if (gameMode != mc.gameMode) {
+                    gameMode = mc.gameMode;
+                    delayField = findField(gameMode.getClass(), "rightClickDelay");
+                }
+                if (delayField == null) return;
+                try {
+                    delayField.setAccessible(true);
+                    if (originalDelay < 0) originalDelay = delayField.getInt(gameMode);
+                    delayField.setInt(gameMode, 0);
+                } catch (ReflectiveOperationException | RuntimeException ignored) {}
+            }
+            @Override public void onDisable() {
+                if (delayField != null && gameMode != null && originalDelay >= 0) {
+                    try { delayField.setAccessible(true); delayField.setInt(gameMode, originalDelay); }
+                    catch (ReflectiveOperationException | RuntimeException ignored) {}
+                }
+                originalDelay = -1;
+                gameMode = null;
+                delayField = null;
+            }
+        });
 
         // Client
         add("Click GUI", "Open and close the RIFT menu with Right Shift.", "Client", true);
         add("Anti-Bot", "Filters likely fake player entities from client-side displays.", "Client", false);
         add("Friends List", "Stores teammate names and identifies them in client displays.", "Client", false);
         add("Self-Destruct", "Disables RIFT modules and hides its overlays for this session.", "Client", false);
+    }
+
+    private static Field findField(Class<?> type, String name) {
+        for (Class<?> current = type; current != null; current = current.getSuperclass()) {
+            try { return current.getDeclaredField(name); }
+            catch (NoSuchFieldException ignored) {}
+        }
+        return null;
     }
 
     private static int readInt(Object target, String name) {
