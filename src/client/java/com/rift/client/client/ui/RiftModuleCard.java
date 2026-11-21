@@ -13,7 +13,7 @@ public final class RiftModuleCard {
     ) {
         float s = width / 282f;
         int background = hovered ? 0xFF1D1930 : RiftTheme.PANEL;
-        int border = hovered ? 0xFF4A4A4A : RiftTheme.BORDER;
+        int border = hovered ? 0xFF3A3055 : RiftTheme.BORDER;
         RiftTheme.roundedPanel(g, x, y, width, height, Math.round(8 * s), background, border);
         if (enabledProgress > 0.02f) {
             g.fill(x, y + Math.round(7 * s), x + Math.max(2, Math.round(2 * s)),
@@ -24,14 +24,14 @@ public final class RiftModuleCard {
         RiftTheme.text(g, font, name, left, y + Math.round(13 * s), RiftTheme.WHITE);
         String desc = description.length() > 54 ? description.substring(0, 51) + "..." : description;
         RiftTheme.text(g, font, desc, left, y + Math.round(34 * s), RiftTheme.GRAY);
-        if (pinned) RiftTheme.text(g, font, "★", x + Math.round(3 * s), y + Math.round(13 * s), 0xFFBDBDBD);
+        if (pinned) RiftTheme.text(g, font, "★", x + Math.round(3 * s), y + Math.round(13 * s), 0xFFC4A7FF);
 
         int settingsX = x + width - Math.round(52 * s);
         int settingsY = y + Math.round(15 * s);
         int settingsW = Math.round(18 * s);
         int settingsH = Math.round(19 * s);
         RiftTheme.roundedPanel(g, settingsX, settingsY, settingsW, settingsH,
-            Math.round(6 * s), 0xFF202020, RiftTheme.BORDER);
+            Math.round(6 * s), 0xFF1B1729, RiftTheme.BORDER);
         RiftTheme.text(g, font, "⚙", settingsX + Math.round(4 * s),
             settingsY + Math.round(5 * s), RiftTheme.GRAY);
 
@@ -41,7 +41,7 @@ public final class RiftModuleCard {
             RiftTheme.toggle(g, toggleX, toggleY, enabledProgress, s);
         } else {
             RiftTheme.roundedPanel(g, toggleX, toggleY, Math.round(23 * s), Math.round(13 * s),
-                Math.round(7 * s), 0xFF242424, 0xFF444444);
+                Math.round(7 * s), 0xFF24202B, 0xFF403747);
         }
     }
 }
