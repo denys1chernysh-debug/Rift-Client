@@ -15,7 +15,7 @@ public final class RiftSidebar {
         g.fill(x, y, x + sidebarWidth, y + height, RiftTheme.SIDEBAR);
 
         // Brand block
-        g.fill(x + 16, y + 16, x + 42, y + 42, 0xFF7544D5);
+        RiftTheme.roundedRect(g, x + 16, y + 16, 26, 26, 8, 0xFF7544D5);
         RiftTheme.text(g, font, "ϟ", x + 24, y + 21, RiftTheme.WHITE);
         RiftTheme.text(g, font, "RIFT", x + 51, y + 18, RiftTheme.WHITE);
         RiftTheme.text(g, font, "FABRIC CLIENT", x + 51, y + 32, RiftTheme.GRAY);
@@ -26,8 +26,8 @@ public final class RiftSidebar {
             int itemY = y + 88 + i * 34;
             boolean active = selected == i;
             if (active) {
-                g.fill(x + 9, itemY - 5, x + sidebarWidth - 9, itemY + 25, 0xFF282039);
-                g.fill(x + 9, itemY - 5, x + 12, itemY + 25, RiftTheme.PURPLE_GLOW);
+                RiftTheme.roundedRect(g, x + 9, itemY - 5, sidebarWidth - 18, 30, 8, 0xFF282039);
+                RiftTheme.roundedRect(g, x + 9, itemY - 5, 3, 30, 2, RiftTheme.PURPLE_GLOW);
             }
             RiftTheme.text(g, font, ICONS[i], x + 19, itemY + 3,
                 active ? RiftTheme.PURPLE_GLOW : RiftTheme.GRAY);
@@ -42,9 +42,8 @@ public final class RiftSidebar {
 
         // Connection / profile status card
         int profileY = y + height - 57;
-        g.fill(x + 11, profileY, x + sidebarWidth - 11, y + height - 11, 0xFF151222);
-        g.outline(x + 11, profileY, sidebarWidth - 22, 46, RiftTheme.BORDER);
-        g.fill(x + 20, profileY + 18, x + 26, profileY + 24, RiftTheme.GREEN);
+        RiftTheme.roundedPanel(g, x + 11, profileY, sidebarWidth - 22, 46, 8, 0xFF151222, RiftTheme.BORDER);
+        RiftTheme.roundedRect(g, x + 20, profileY + 18, 6, 6, 3, RiftTheme.GREEN);
         RiftTheme.text(g, font, "Default", x + 34, profileY + 11, RiftTheme.WHITE);
         RiftTheme.text(g, font, "RIFT IS CONNECTED", x + 34, profileY + 25, RiftTheme.GRAY);
         RiftTheme.text(g, font, "v1.0", x + sidebarWidth - 35, profileY + 17, 0xFFB9A7D8);
