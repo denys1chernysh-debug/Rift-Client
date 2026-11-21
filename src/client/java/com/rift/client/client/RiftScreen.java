@@ -168,8 +168,8 @@ public class RiftScreen extends Screen {
         int backdrop = ((int)(0xB0 * open) << 24) | 0x00030810;
         g.fill(0, 0, width, height, backdrop);
 
-        g.fill(x, y, x + windowW, y + windowH, RiftTheme.BACKGROUND);
-        g.outline(x, y, windowW, windowH, 0xFF60328A);
+        RiftTheme.roundedPanel(g, x, y, windowW, windowH, Math.round(13 * uiScale),
+            RiftTheme.BACKGROUND, 0xFF60328A);
         g.fill(x + 1, y + 1, x + Math.round(SIDEBAR_W * scaleX), y + windowH - 1, RiftTheme.SIDEBAR);
         RiftSidebar.render(g, minecraft.font, x, y, Math.round(SIDEBAR_W * scaleX), windowH,
             page, ModuleManager.getFavorites().size());
@@ -187,7 +187,8 @@ public class RiftScreen extends Screen {
 
         int profileX = 574;
         RiftTheme.panel(g, sx(profileX, x, scaleX), sy(18, y, scaleY), Math.round(112 * scaleX), Math.round(30 * scaleY), profileMenu);
-        g.fill(sx(profileX + 5, x, scaleX), sy(22, y, scaleY), sx(profileX + 25, x, scaleX), sy(44, y, scaleY), 0xFF8432D6);
+        RiftTheme.roundedRect(g, sx(profileX + 5, x, scaleX), sy(22, y, scaleY),
+            Math.round(20 * scaleX), Math.round(22 * scaleY), Math.round(7 * scaleX), 0xFF8432D6);
         RiftTheme.text(g, minecraft.font, "R", sx(profileX + 12, x, scaleX), sy(28, y, scaleY), RiftTheme.WHITE);
         RiftTheme.text(g, minecraft.font, "ACTIVE PROFILE", sx(profileX + 31, x, scaleX), sy(23, y, scaleY), RiftTheme.MUTED);
         RiftTheme.text(g, minecraft.font, profile, sx(profileX + 31, x, scaleX), sy(34, y, scaleY), RiftTheme.WHITE);
@@ -254,8 +255,9 @@ public class RiftScreen extends Screen {
             sx(mainX + 77, x, scaleX), sy(447, y, scaleY), RiftTheme.GRAY);
         RiftTheme.text(g, minecraft.font, "C H A N G E S   A P P L Y   I N S T A N T L Y",
             sx(406, x, scaleX), sy(408, y, scaleY), RiftTheme.MUTED);
-        g.fill(sx(540, x, scaleX), sy(434, y, scaleY), sx(742, x, scaleX), sy(468, y, scaleY), 0xFF35175B);
-        g.outline(sx(540, x, scaleX), sy(434, y, scaleY), Math.round(202 * scaleX), Math.round(34 * scaleY), 0xFF67339A);
+        RiftTheme.roundedPanel(g, sx(540, x, scaleX), sy(434, y, scaleY),
+            Math.round(202 * scaleX), Math.round(34 * scaleY), Math.round(8 * scaleX),
+            0xFF35175B, 0xFF67339A);
         RiftTheme.text(g, minecraft.font, "↓  Save Settings",
             sx(601, x, scaleX), sy(447, y, scaleY), RiftTheme.WHITE);
 
