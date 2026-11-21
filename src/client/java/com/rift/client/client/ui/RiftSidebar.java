@@ -23,11 +23,11 @@ public final class RiftSidebar {
 
         RiftTheme.text(g, font, "W O R K S P A C E", x + 17, y + 66, RiftTheme.MUTED);
         for (int i = 0; i < CATEGORIES.length; i++) {
-            int itemY = y + 88 + i * 34;
+            int itemY = y + 88 + i * 27;
             boolean active = selected == i;
             if (active) {
-                RiftTheme.roundedRect(g, x + 9, itemY - 5, sidebarWidth - 18, 30, 8, 0xFF282039);
-                RiftTheme.roundedRect(g, x + 9, itemY - 5, 3, 30, 2, RiftTheme.PURPLE_GLOW);
+                RiftTheme.roundedRect(g, x + 9, itemY - 2, sidebarWidth - 18, 25, 8, 0xFF282039);
+                RiftTheme.roundedRect(g, x + 9, itemY - 2, 3, 25, 2, RiftTheme.PURPLE_GLOW);
             }
             RiftTheme.text(g, font, ICONS[i], x + 19, itemY + 3,
                 active ? RiftTheme.PURPLE_GLOW : RiftTheme.GRAY);
