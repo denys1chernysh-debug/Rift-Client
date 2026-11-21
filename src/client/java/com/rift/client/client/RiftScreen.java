@@ -46,7 +46,7 @@ public class RiftScreen extends Screen {
         List<Module> result = new ArrayList<>();
         String term = search.toLowerCase(Locale.ROOT).trim();
         for (Module module : ModuleManager.getModules()) {
-            boolean inCategory = page == 6
+            boolean inCategory = page == 7
                 ? module.isPinned()
                 : module.getCategory().equalsIgnoreCase(RiftSidebar.CATEGORIES[page]);
             boolean matches = term.isEmpty()
@@ -255,12 +255,7 @@ public class RiftScreen extends Screen {
 
     private String categoryDescription() {
         return switch (page) {
-            case 0 -> "Combat awareness and status displays.";
-            case 1 -> "Movement, equipment, and player utilities.";
-            case 2 -> "Visual clarity and display enhancements.";
-            case 3 -> "Useful tools for everyday sessions.";
-            case 4 -> "Purpose-built tools for Donut SMP.";
-            case 5 -> "Customize and control your RIFT client.";
+            case 0 -> "Combat status, cooldowns, and equipment.";\n            case 1 -> "Crystal and anchor inventory tools.";\n            case 2 -> "Mace, cart, and spear information.";\n            case 3 -> "Donut SMP and terrain intelligence.";\n            case 4 -> "Movement and inventory utilities.";\n            case 5 -> "HUDs, visuals, and render options.";\n            case 6 -> "Profiles, settings, and client tools.";
             default -> "Your pinned modules and quick toggles.";
         };
     }
