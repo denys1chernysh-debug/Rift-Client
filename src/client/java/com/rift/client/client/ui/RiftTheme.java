@@ -52,9 +52,9 @@ public final class RiftTheme {
 
     public static void toggle(GuiGraphicsExtractor g, int x, int y, float progress) {
         int track = progress > 0.5f ? PURPLE_GLOW : 0xFF343044;
-        roundedRect(g, x, y, 38, 20, 10, track);
-        int knobX = x + 3 + Math.round(17 * progress);
-        roundedRect(g, knobX, y + 3, 14, 14, 7, WHITE);
+        roundedRect(g, x, y, 23, 13, 7, track);
+        int knobX = x + 2 + Math.round(10 * progress);
+        roundedRect(g, knobX, y + 2, 9, 9, 5, WHITE);
     }
 
     public static int mix(int from, int to, float amount) {
