@@ -22,17 +22,15 @@ public final class RiftModuleCard {
         String desc = description.length() > 39 ? description.substring(0, 36) + "..." : description;
         RiftTheme.text(g, font, desc, x + 12, y + 24, RiftTheme.GRAY);
 
-        RiftTheme.text(g, font, pinned ? "★" : "☆", x + width - 83, y + 8,
-            pinned ? 0xFFC4A7FF : RiftTheme.MUTED);
-        g.fill(x + width - 65, y + 6, x + width - 46, y + 25, 0xFF211B30);
-        g.outline(x + width - 65, y + 6, 19, 19, RiftTheme.BORDER);
-        RiftTheme.text(g, font, "⚙", x + width - 60, y + 9, RiftTheme.GRAY);
+        if (pinned) RiftTheme.text(g, font, "★", x + 4, y + 8, 0xFFC4A7FF);
+        g.fill(x + width - 52, y + 15, x + width - 34, y + 34, 0xFF211B30);
+        g.outline(x + width - 52, y + 15, 18, 19, RiftTheme.BORDER);
+        RiftTheme.text(g, font, "⚙", x + width - 48, y + 18, RiftTheme.GRAY);
 
         if (implemented) {
-            RiftTheme.toggle(g, x + width - 43, y + 13, enabledProgress);
+            RiftTheme.toggle(g, x + width - 30, y + 18, enabledProgress);
         } else {
-            RiftTheme.roundedPanel(g, x + width - 43, y + 13, 38, 20, 10, 0xFF24202B, 0xFF403747);
-            RiftTheme.text(g, font, "—", x + width - 28, y + 19, RiftTheme.MUTED);
+            RiftTheme.roundedPanel(g, x + width - 30, y + 18, 23, 13, 7, 0xFF24202B, 0xFF403747);
         }
     }
 }
