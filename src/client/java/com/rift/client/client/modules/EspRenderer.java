@@ -71,7 +71,7 @@ public final class EspRenderer {
         LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(EspRenderer::render);
     }
 
-    /** Call once per client tick. Each tick scans at most one 16x16x16 section. */
+    /** Call once per client tick. Each tick scans at most two nearby sections. */
     public static void tick() {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -111,7 +111,7 @@ public final class EspRenderer {
             SCANNED_KEYS.clear();
         }
 
-        if (SECTIONS.isEmpty()) return;
+        if (SECTIONS.isEmpty() || SCANNED.size() >= MAX_MARKERS) return;
         for (int scan = 0; scan < 2 && !SECTIONS.isEmpty(); scan++) {
         Section section = SECTIONS.get(sectionCursor++);
         if (sectionCursor >= SECTIONS.size()) sectionCursor = 0;
@@ -120,7 +120,7 @@ public final class EspRenderer {
         int baseY = section.sectionY << 4;
         int baseZ = section.chunkZ << 4;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        if (!level.hasChunkAt(new BlockPos(baseX, baseY, baseZ))) return;
+        if (!level.hasChunkAt(new BlockPos(baseX, baseY, baseZ))) continue;
 
         for (int y = 0; y < 16; y++) {
             for (int x = 0; x < 16; x++) {
@@ -151,7 +151,7 @@ public final class EspRenderer {
                 for (int dz = -ring; dz <= ring; dz++) {
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
                     // Visit the player's current height first, then expand vertically.
-                    for (int offset = 0; offset < Math.max(centerSectionY - minSection, maxSection - centerSectionY); offset++) {
+                    for (int offset = 0; offset <= Math.max(centerSectionY - minSection, maxSection - centerSectionY); offset++) {
                         int lower = centerSectionY - offset;
                         int upper = centerSectionY + offset;
                         if (lower >= minSection && lower < maxSection) {
