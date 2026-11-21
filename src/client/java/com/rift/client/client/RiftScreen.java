@@ -216,7 +216,7 @@ public class RiftScreen extends Screen {
             int col = i % 2;
             int row = i / 2;
             int cardX = gridX + col * (cardW + gap);
-            int cardY = gridY + row * (cardH + 7);
+            int cardY = gridY + row * (cardH + 8);
             int actualCardX = sx(cardX, x, scaleX);
             int actualCardY = sy(cardY, y, scaleY);
             int actualCardW = Math.round(cardW * scaleX);
@@ -381,7 +381,7 @@ public class RiftScreen extends Screen {
 
         for (int i = 0; i < RiftSidebar.CATEGORIES.length; i++) {
             int itemY = 88 + i * 27;
-            if (mx >= 8 && mx <= SIDEBAR_W - 8 && my >= itemY - 8 && my <= itemY + 27) {
+            if (mx >= 8 && mx <= SIDEBAR_W - 8 && my >= itemY - 2 && my <= itemY + 23) {
                 page = i; scroll = 0; search = ""; searchFocused = false;
                 settingsModule = null; profileMenu = false; settingsOpen = false;
                 return true;
@@ -467,7 +467,7 @@ public class RiftScreen extends Screen {
         int shownCount = Math.min(perPage, Math.max(0, modules.size() - scroll));
         for (int i = 0; i < shownCount; i++) {
             int cardX = gridX + (i % 2) * (cardW + gap);
-            int cardY = gridY + (i / 2) * (cardH + 8);
+            int cardY = gridY + (i / 2) * (cardH + gap);
             if (mx < cardX || mx > cardX + cardW || my < cardY || my > cardY + cardH) continue;
             Module module = modules.get(scroll + i);
             if (mx >= cardX + 8 && mx < cardX + 25 && event.button() == 1) {
@@ -483,16 +483,12 @@ public class RiftScreen extends Screen {
             if (mx >= cardX + cardW - 30) {
                 if (module.isImplemented()) module.toggle();
                 saveProfile();
-                settingsModule = module;
                 return true;
             }
             if (event.button() == 1) {
                 module.setPinned(!module.isPinned());
                 return true;
             }
-            if (module.isImplemented()) module.toggle();
-            saveProfile();
-            settingsModule = module;
             return true;
         }
 
