@@ -1,6 +1,8 @@
 package com.rift.client.client.modules;
 
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -15,13 +17,9 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class DonutScanner {
     public enum Scan { SUSPICIOUS, BASES, AMETHYST, DEBRIS }
-    private static final Set<Long> scanned = new HashSet<>();
+    private static final Map<Scan, ScanState> STATES = new EnumMap<>(Scan.class);
     private static ClientLevel lastLevel;
-    private static int cursor;
-    private static int reportCooldown;
-    private static int matches;
-    private static int scannedChunks;
-    private DonutScanner() {}
+    private DonutScanner() { for (Scan scan : Scan.values()) STATES.put(scan, new ScanState()); }
 
     public static void tick(Scan scan) {
         Minecraft mc = Minecraft.getInstance();
@@ -29,26 +27,22 @@ public final class DonutScanner {
         if (level == null || mc.player == null) return;
         if (lastLevel != level) {
             lastLevel = level;
-            scanned.clear();
-            cursor = 0;
-            matches = 0;
-            scannedChunks = 0;
+            for (ScanState state : STATES.values()) state.reset();
         }
-        if (reportCooldown > 0) reportCooldown--;
+        ScanState progress = STATES.get(scan);
+        if (progress.reportCooldown > 0) progress.reportCooldown--;
         int radius = scan == Scan.DEBRIS ? 3 : 5;
         int diameter = radius * 2 + 1;
         int total = diameter * diameter;
-        int index = cursor++ % total;
+        int index = progress.cursor++ % total;
         int cx = (mc.player.getBlockX() >> 4) + index % diameter - radius;
         int cz = (mc.player.getBlockZ() >> 4) + index / diameter - radius;
         long key = (((long) cx) << 32) ^ (cz & 0xffffffffL);
-        if (scanned.contains(key)) {
-            if (scanned.size() >= total) {
-                if (reportCooldown == 0) {
-                    mc.player.displayClientMessage(Component.literal("RIFT " + scan.name()
-                        + ": " + matches + " signals in " + scannedChunks + " loaded chunks"), true);
-                    reportCooldown = 80;
-                }
+        if (progress.scanned.contains(key)) {
+            if (progress.scanned.size() >= total && progress.reportCooldown == 0) {
+                mc.player.displayClientMessage(Component.literal("RIFT " + scan.name()
+                    + ": " + progress.matches + " signals in " + progress.scannedChunks + " loaded chunks"), true);
+                progress.reportCooldown = 80;
             }
             return;
         }
@@ -76,19 +70,28 @@ public final class DonutScanner {
                 }
             }
         }
-        scanned.add(key);
-        scannedChunks++;
+        progress.scanned.add(key);
+        progress.scannedChunks++;
         boolean match = switch (scan) {
             case SUSPICIOUS -> storage >= 3 || (utility >= 12 && storage >= 1);
             case BASES -> storage >= 2 || utility >= 10;
             case AMETHYST -> amethyst >= 4;
             case DEBRIS -> debris > 0;
         };
-        if (match) matches++;
-        if (reportCooldown == 0) {
+        if (match) progress.matches++;
+        if (progress.reportCooldown == 0) {
             mc.player.displayClientMessage(Component.literal("RIFT " + scan.name()
-                + ": " + matches + " signals / " + scannedChunks + " loaded chunks"), true);
-            reportCooldown = 80;
+                + ": " + progress.matches + " signals / " + progress.scannedChunks + " loaded chunks"), true);
+            progress.reportCooldown = 80;
         }
+    }
+
+    private static final class ScanState {
+        final Set<Long> scanned = new HashSet<>();
+        int cursor;
+        int reportCooldown;
+        int matches;
+        int scannedChunks;
+        void reset() { scanned.clear(); cursor = 0; reportCooldown = 0; matches = 0; scannedChunks = 0; }
     }
 }
