@@ -11,26 +11,37 @@ public final class RiftModuleCard {
         String name, String description, float enabledProgress,
         boolean implemented, boolean pinned, boolean hovered
     ) {
+        float s = width / 282f;
         int background = hovered ? 0xFF1D1930 : RiftTheme.PANEL;
         int border = hovered ? 0xFF493765 : RiftTheme.BORDER;
-        RiftTheme.roundedPanel(g, x, y, width, height, 8, background, border);
+        RiftTheme.roundedPanel(g, x, y, width, height, Math.round(8 * s), background, border);
         if (enabledProgress > 0.02f) {
-            g.fill(x, y + 7, x + 2, y + height - 7, RiftTheme.PURPLE_GLOW);
+            g.fill(x, y + Math.round(7 * s), x + Math.max(2, Math.round(2 * s)),
+                y + height - Math.round(7 * s), RiftTheme.PURPLE_GLOW);
         }
 
-        RiftTheme.text(g, font, name, x + 12, y + 8, RiftTheme.WHITE);
-        String desc = description.length() > 39 ? description.substring(0, 36) + "..." : description;
-        RiftTheme.text(g, font, desc, x + 12, y + 24, RiftTheme.GRAY);
+        int left = x + Math.round(15 * s);
+        RiftTheme.text(g, font, name, left, y + Math.round(13 * s), RiftTheme.WHITE);
+        String desc = description.length() > 54 ? description.substring(0, 51) + "..." : description;
+        RiftTheme.text(g, font, desc, left, y + Math.round(34 * s), RiftTheme.GRAY);
+        if (pinned) RiftTheme.text(g, font, "★", x + Math.round(3 * s), y + Math.round(13 * s), 0xFFC4A7FF);
 
-        if (pinned) RiftTheme.text(g, font, "★", x + 4, y + 8, 0xFFC4A7FF);
-        g.fill(x + width - 52, y + 15, x + width - 34, y + 34, 0xFF211B30);
-        g.outline(x + width - 52, y + 15, 18, 19, RiftTheme.BORDER);
-        RiftTheme.text(g, font, "⚙", x + width - 48, y + 18, RiftTheme.GRAY);
+        int settingsX = x + width - Math.round(52 * s);
+        int settingsY = y + Math.round(15 * s);
+        int settingsW = Math.round(18 * s);
+        int settingsH = Math.round(19 * s);
+        RiftTheme.roundedPanel(g, settingsX, settingsY, settingsW, settingsH,
+            Math.round(6 * s), 0xFF211B30, RiftTheme.BORDER);
+        RiftTheme.text(g, font, "⚙", settingsX + Math.round(4 * s),
+            settingsY + Math.round(5 * s), RiftTheme.GRAY);
 
+        int toggleX = x + width - Math.round(30 * s);
+        int toggleY = y + Math.round(18 * s);
         if (implemented) {
-            RiftTheme.toggle(g, x + width - 30, y + 18, enabledProgress);
+            RiftTheme.toggle(g, toggleX, toggleY, enabledProgress, s);
         } else {
-            RiftTheme.roundedPanel(g, x + width - 30, y + 18, 23, 13, 7, 0xFF24202B, 0xFF403747);
+            RiftTheme.roundedPanel(g, toggleX, toggleY, Math.round(23 * s), Math.round(13 * s),
+                Math.round(7 * s), 0xFF24202B, 0xFF403747);
         }
     }
 }
