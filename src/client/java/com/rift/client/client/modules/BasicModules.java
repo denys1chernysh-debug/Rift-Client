@@ -30,7 +30,6 @@ public final class BasicModules {
         add("Movement HUD", "Displays your current movement speed.", "Player", true);
         add("Combat HUD", "Displays a compact combat status panel.", "Combat", true);
 
-        // Donut SMP exploration and world information.
         add("Sus Chunks", "Flags unusual terrain patterns in loaded chunks.", "Donut", false);
         add("Chunk Finder", "Inspects loaded chunk information.", "Donut", false);
         add("New Chunks", "Highlights candidates for recently generated chunks.", "Donut", false);
@@ -44,7 +43,6 @@ public final class BasicModules {
         add("Sound Detector", "Displays nearby in-game sound events.", "Donut", false);
         add("Portal / Beacon Tracer", "Marks visible portals and beacons.", "Render", false);
 
-        // Visual and interface modules.
         add("Player ESP", "Adds visual markers for visible players.", "Render", false);
         add("Entity ESP", "Adds visual markers for selected entities.", "Render", false);
         add("Target Renderer", "Displays information about a selected entity.", "Render", false);
@@ -60,7 +58,6 @@ public final class BasicModules {
         add("Freecam", "Local camera exploration mode.", "Player", false);
         add("Screenshot Manager", "Organizes screenshots from your session.", "Misc", false);
 
-        // Movement and quality-of-life utilities.
         add("Fly", "Client movement mode.", "Player", false);
         add("Scaffold", "Assisted block placement mode.", "Player", false);
         add("Bridge Assist", "Assists with careful bridging.", "Player", false);
@@ -82,7 +79,6 @@ public final class BasicModules {
         add("Statistics", "Displays personal session statistics.", "Donut", false);
         add("Donut HUD", "Combines useful Donut SMP information.", "Donut", false);
 
-        // RIFT configuration and customization.
         add("Notifications", "Displays RIFT status notifications.", "Client", false);
         add("Profiles", "Stores named module configurations.", "Client", false);
         add("HUD Editor", "Customize the position of HUD elements.", "Client", false);
@@ -92,6 +88,10 @@ public final class BasicModules {
     }
 
     private static void add(String name, String description, String category, boolean implemented) {
-        ModuleManager.register(new Module(name, description, category, implemented));
+        Module module = new Module(name, description, category) {};
+        if (!implemented) {
+            module.setEnabled(false);
+        }
+        ModuleManager.register(module);
     }
 }
