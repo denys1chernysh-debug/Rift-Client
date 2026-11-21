@@ -39,11 +39,11 @@ public final class BasicModules {
         add("Amethyst Finder", "Find amethyst geode candidates in loaded terrain.", "Donut", false);
         add("Ancient Debris Finder", "Find ancient debris in loaded terrain.", "Donut", false);
         add("Spawner / Trial Chamber Finder", "Inspect nearby structure indicators.", "Donut", false);
-        add("Live Player Finder", "Show information about visible players.", "Donut", false);
+        add("Live Player Finder", "Show the number of players currently visible in your world.", "Donut", true);
         add("Sound Detector", "Display nearby in-game sound events.", "Donut", false);
         add("Server Information", "Show current server details.", "Donut", false);
-        add("Statistics", "Display session statistics.", "Donut", false);
-        add("Donut HUD", "Combine useful Donut SMP information.", "Donut", false);
+        add("Statistics", "Display your XP level and health.", "Donut", true);
+        add("Donut HUD", "Combine coordinates, chunk, and inventory status.", "Donut", true);
         add("Base Finder", "Inspect visible terrain for base indicators.", "Donut", false);
         add("Custom Donut Profile", "Dedicated Donut SMP module configuration.", "Donut", false);
 
@@ -73,7 +73,7 @@ public final class BasicModules {
         add("Fast XP", "Experience bottle convenience setting.", "Player", false);
         add("Pearl Macro", "Configurable item-use shortcut.", "Player", false);
         add("Fast Place", "Block placement convenience setting.", "Player", false);
-        add("Inventory Display", "Display inventory contents.", "Player", false);
+        add("Inventory Display", "Display useful inventory item counts.", "Player", true);
         add("Fly", "Client movement mode.", "Player", false);
         add("Scaffold", "Assisted block placement mode.", "Player", false);
         add("Bridge Assist", "Assists with careful bridging.", "Player", false);
@@ -81,13 +81,13 @@ public final class BasicModules {
         add("No Jump Delay", "Adjust local jump timing.", "Player", false);
 
         // Combat status and kit information (no automated attacks)
-        add("Armor Status", "Show armor and durability status.", "Combat", false);
-        add("Totem Status", "Show offhand and inventory totem status.", "Combat", false);
-        add("Cooldown HUD", "Display item and attack cooldown information.", "Combat", false);
-        add("Crystal Status", "Display crystal-related inventory information.", "Crystal", false);
-        add("Anchor Status", "Display respawn-anchor inventory information.", "Crystal", false);
-        add("Mace Status", "Display mace and wind-charge inventory information.", "Mace", false);
-        add("Cart Status", "Display minecart inventory information.", "Mace", false);
+        add("Armor Status", "Show equipped armor status.", "Combat", true);
+        add("Totem Status", "Show offhand and inventory totem status.", "Combat", true);
+        add("Cooldown HUD", "Display attack cooldown information.", "Combat", true);
+        add("Crystal Status", "Display crystal-related inventory information.", "Crystal", true);
+        add("Anchor Status", "Display respawn-anchor inventory information.", "Crystal", true);
+        add("Mace Status", "Display mace and wind-charge inventory information.", "Mace", true);
+        add("Cart Status", "Display minecart inventory information.", "Mace", true);
         add("Spear Status", "Display spear inventory information.", "Mace", false);
 
         // Client tools
