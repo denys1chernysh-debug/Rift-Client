@@ -1,7 +1,8 @@
 package com.rift.client.client;
 
 import com.rift.client.client.modules.Module;
-import com.rift.client.client.modules.ModuleManager;\nimport com.rift.client.client.modules.EspSettings;
+import com.rift.client.client.modules.ModuleManager;
+import com.rift.client.client.modules.EspSettings;
 import com.rift.client.client.ui.RiftModuleCard;
 import com.rift.client.client.ui.RiftSidebar;
 import com.rift.client.client.ui.RiftTheme;
