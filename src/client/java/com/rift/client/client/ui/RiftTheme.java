@@ -6,17 +6,17 @@ import net.minecraft.client.gui.Font;
 public final class RiftTheme {
     private RiftTheme() {}
 
-    public static final int BACKGROUND = 0xFF090909;
-    public static final int SIDEBAR = 0xFF0D0D0D;
-    public static final int PANEL = 0xFF141414;
-    public static final int PANEL_HOVER = 0xFF1B1B1B;
-    public static final int PURPLE = 0xFF858585;
-    public static final int PURPLE_GLOW = 0xFFB8B8B8;
-    public static final int BORDER = 0xFF303030;
-    public static final int WHITE = 0xFFF0F0F0;
-    public static final int GRAY = 0xFF9A9A9A;
-    public static final int MUTED = 0xFF686868;
-    public static final int GREEN = 0xFFB0B0B0;
+    public static final int BACKGROUND = 0xFF0B0A12;
+    public static final int SIDEBAR = 0xFF100E1B;
+    public static final int PANEL = 0xFF161324;
+    public static final int PANEL_HOVER = 0xFF1D1930;
+    public static final int PURPLE = 0xFF8B5CF6;
+    public static final int PURPLE_GLOW = 0xFFA855F7;
+    public static final int BORDER = 0xFF241F38;
+    public static final int WHITE = 0xFFF8FAFC;
+    public static final int GRAY = 0xFF8E8AA8;
+    public static final int MUTED = 0xFF68627F;
+    public static final int GREEN = 0xFF4ADE80;
 
     /** Draw a rounded rectangle using horizontal scanlines (Minecraft GUI has no CSS-style radius primitive). */
     public static void roundedRect(GuiGraphicsExtractor g, int x, int y, int width, int height, int radius, int color) {
@@ -55,7 +55,7 @@ public final class RiftTheme {
     }
 
     public static void toggle(GuiGraphicsExtractor g, int x, int y, float progress, float scale) {
-        int track = progress > 0.5f ? PURPLE_GLOW : 0xFF343434;
+        int track = progress > 0.5f ? PURPLE_GLOW : 0xFF343044;
         int w = Math.round(23 * scale), h = Math.round(13 * scale);
         roundedRect(g, x, y, w, h, Math.round(7 * scale), track);
         int knob = Math.round(9 * scale);
