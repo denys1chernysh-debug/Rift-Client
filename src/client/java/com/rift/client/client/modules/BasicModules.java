@@ -143,11 +143,19 @@ public final class BasicModules {
         add("Trajectories", "Draws predicted paths for supported projectiles.", "Render", false);
         add("Freecam", "Detaches the camera from the local player.", "Render", false);
 
-        // Donut
-        add("Sus Chunks", "Scores suspicious patterns in chunks already loaded by the client.", "Donut", false);
-        add("Base Finder", "Combines visible-world scanners to flag possible player-built areas.", "Donut", false);
-        add("Amethyst Finder", "Finds visible amethyst geodes and openings in loaded chunks.", "Donut", false);
-        add("Ancient Debris Finder", "Finds ancient debris in blocks already sent to the client.", "Donut", false);
+        // Donut scanners inspect only chunks the server has already sent to this client.
+        ModuleManager.register(new Module("Sus Chunks", "Scores loaded chunks using visible player-build and storage block counts.", "Donut") {
+            @Override public void onTick() { DonutScanner.tick(DonutScanner.Scan.SUSPICIOUS); }
+        });
+        ModuleManager.register(new Module("Base Finder", "Combines visible storage, utility, and player-build block signals in loaded chunks.", "Donut") {
+            @Override public void onTick() { DonutScanner.tick(DonutScanner.Scan.BASES); }
+        });
+        ModuleManager.register(new Module("Amethyst Finder", "Scans loaded chunks for amethyst geode blocks.", "Donut") {
+            @Override public void onTick() { DonutScanner.tick(DonutScanner.Scan.AMETHYST); }
+        });
+        ModuleManager.register(new Module("Ancient Debris Finder", "Scans loaded Nether chunks for ancient debris.", "Donut") {
+            @Override public void onTick() { DonutScanner.tick(DonutScanner.Scan.DEBRIS); }
+        });
 
         // Misc
         ModuleManager.register(new Module("Auto XP", "Throws an XP bottle from your hotbar at a controlled interval.", "Misc") {
@@ -239,9 +247,29 @@ public final class BasicModules {
 
         // Client
         add("Click GUI", "Open and close the RIFT menu with Right Shift.", "Client", true);
-        add("Anti-Bot", "Filters likely fake player entities from client-side displays.", "Client", false);
-        add("Friends List", "Stores teammate names and identifies them in client displays.", "Client", false);
-        add("Self-Destruct", "Disables RIFT modules and hides its overlays for this session.", "Client", false);
+        ModuleManager.register(new Module("Anti-Bot", "Filters obvious NPC and non-player fake-name entries from RIFT player overlays.", "Client") {
+            @Override public void onTick() { ClientUtilities.refreshAntiBot(); }
+        });
+        ModuleManager.register(new Module("Friends List", "Adds the player under your crosshair to the persistent RIFT friends list when enabled.", "Client") {
+            @Override public void onEnable() {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit
+                    && hit.getEntity() instanceof net.minecraft.world.entity.player.Player target
+                    && mc.player != null && target != mc.player) {
+                    ClientUtilities.toggleFriend(target.getGameProfile().name());
+                }
+                setEnabled(false);
+            }
+        });
+        ModuleManager.register(new Module("Self-Destruct", "Immediately disables RIFT modules and closes the RIFT menu for this session.", "Client") {
+            @Override public void onEnable() {
+                for (Module module : ModuleManager.getModules()) {
+                    if (module != this) module.setEnabled(false);
+                }
+                Minecraft.getInstance().gui.setScreen(null);
+                setEnabled(false);
+            }
+        });
     }
 
     private static Field findField(Class<?> type, String name) {
