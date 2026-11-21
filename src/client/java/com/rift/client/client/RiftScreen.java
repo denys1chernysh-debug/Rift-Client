@@ -301,7 +301,7 @@ public class RiftScreen extends Screen {
         int py = sy(105, originY, scaleY);
         int pw = Math.round(460 * scaleX);
         int ph = Math.round(250 * scaleY);
-        g.fill(originX, originY, originX + Math.round(BASE_W * scaleX), originY + Math.round(BASE_H * scaleY), 0x55000000);
+        g.fill(originX, originY, originX + Math.round(760 * scaleX), originY + Math.round(480 * scaleY), 0x55000000);
         RiftTheme.panel(g, px, py, pw, ph, true);
         g.outline(px, py, pw, ph, 0xFF7041A0);
         RiftTheme.text(g, minecraft.font, settingsModule.getName().toUpperCase(Locale.ROOT),
