@@ -82,7 +82,7 @@ public class RiftScreen extends Screen {
             profile = properties.getProperty("profile", "Default");
             EspSettings.setRange("Player ESP", readInt(properties, "esp.player.range", 256));
             EspSettings.setRange("Storage ESP", readInt(properties, "esp.storage.range", 256));
-            EspSettings.setThroughWalls(Boolean.parseBoolean(properties.getProperty("esp.throughWalls", "true")));
+            EspSettings.setThroughWalls(false);
             EspSettings.setShowStorageChests(Boolean.parseBoolean(properties.getProperty("esp.storage.chests", "true")));
             EspSettings.setShowStorageBarrels(Boolean.parseBoolean(properties.getProperty("esp.storage.barrels", "true")));
             EspSettings.setShowStorageShulkers(Boolean.parseBoolean(properties.getProperty("esp.storage.shulkers", "true")));
@@ -106,7 +106,6 @@ public class RiftScreen extends Screen {
         properties.setProperty("profile", profile);
         properties.setProperty("esp.player.range", Integer.toString(EspSettings.getRange("Player ESP")));
         properties.setProperty("esp.storage.range", Integer.toString(EspSettings.getRange("Storage ESP")));
-        properties.setProperty("esp.throughWalls", Boolean.toString(EspSettings.isThroughWalls()));
         properties.setProperty("esp.storage.chests", Boolean.toString(EspSettings.showStorageChests()));
         properties.setProperty("esp.storage.barrels", Boolean.toString(EspSettings.showStorageBarrels()));
         properties.setProperty("esp.storage.shulkers", Boolean.toString(EspSettings.showStorageShulkers()));
@@ -324,7 +323,6 @@ public class RiftScreen extends Screen {
         RiftTheme.text(g, minecraft.font, "16", trackX, trackY + 13, RiftTheme.MUTED);
         RiftTheme.text(g, minecraft.font, "256", trackX + trackW - 18, trackY + 13, RiftTheme.MUTED);
 
-        drawEspToggle(g, px + 18, py + 119, "Through walls", EspSettings.isThroughWalls());
         if (settingsModule.getName().equals("Storage ESP")) {
             drawEspToggle(g, px + 18, py + 151, "Chests", EspSettings.showStorageChests());
             drawEspToggle(g, px + 220, py + 151, "Barrels", EspSettings.showStorageBarrels());
@@ -346,7 +344,6 @@ public class RiftScreen extends Screen {
 
     private void toggleEspOption(String option) {
         switch (option) {
-            case "through" -> EspSettings.setThroughWalls(!EspSettings.isThroughWalls());
             case "chests" -> EspSettings.setShowStorageChests(!EspSettings.showStorageChests());
             case "barrels" -> EspSettings.setShowStorageBarrels(!EspSettings.showStorageBarrels());
             case "shulkers" -> EspSettings.setShowStorageShulkers(!EspSettings.showStorageShulkers());
@@ -432,9 +429,6 @@ public class RiftScreen extends Screen {
                 EspSettings.setRange(settingsModule.getName(), value);
                 saveProfile();
                 return true;
-            }
-            if (my >= 222 && my <= 242 && mx >= 168 && mx <= 310) {
-                toggleEspOption("through"); return true;
             }
             if (settingsModule.getName().equals("Storage ESP")) {
                 if (my >= 254 && my <= 274 && mx >= 168 && mx <= 350) { toggleEspOption("chests"); return true; }
