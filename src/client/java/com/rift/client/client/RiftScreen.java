@@ -255,7 +255,13 @@ public class RiftScreen extends Screen {
 
     private String categoryDescription() {
         return switch (page) {
-            case 0 -> "Combat status, cooldowns, and equipment.";\n            case 1 -> "Crystal and anchor inventory tools.";\n            case 2 -> "Mace, cart, and spear information.";\n            case 3 -> "Donut SMP and terrain intelligence.";\n            case 4 -> "Movement and inventory utilities.";\n            case 5 -> "HUDs, visuals, and render options.";\n            case 6 -> "Profiles, settings, and client tools.";
+            case 0 -> "Combat status, cooldowns, and equipment.";
+            case 1 -> "Crystal and anchor inventory tools.";
+            case 2 -> "Mace, cart, and spear information.";
+            case 3 -> "Donut SMP and terrain intelligence.";
+            case 4 -> "Movement and inventory utilities.";
+            case 5 -> "HUDs, visuals, and render options.";
+            case 6 -> "Profiles, settings, and client tools.";
             default -> "Your pinned modules and quick toggles.";
         };
     }
@@ -272,7 +278,7 @@ public class RiftScreen extends Screen {
         int my = (int) Math.round((event.y() - y) / scaleY);
 
         for (int i = 0; i < RiftSidebar.CATEGORIES.length; i++) {
-            int itemY = 72 + i * 39;
+            int itemY = 88 + i * 34;
             if (mx >= 8 && mx <= SIDEBAR_W - 8 && my >= itemY - 8 && my <= itemY + 27) {
                 page = i; scroll = 0; search = ""; searchFocused = false;
                 settingsModule = null; profileMenu = false; settingsOpen = false;
