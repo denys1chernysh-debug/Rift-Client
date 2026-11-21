@@ -47,12 +47,20 @@ public class RiftScreen extends Screen {
         List<Module> result = new ArrayList<>();
         String term = search.toLowerCase(Locale.ROOT).trim();
         for (Module module : ModuleManager.getModules()) {
-            boolean inCategory = page == 7
-                ? module.isPinned()
-                : module.getCategory().equalsIgnoreCase(RiftSidebar.CATEGORIES[page]);
+            String category = module.getCategory();
+            boolean inCategory = switch (page) {
+                case 0 -> category.equalsIgnoreCase("Combat") || category.equalsIgnoreCase("Crystal") || category.equalsIgnoreCase("Mace");
+                case 1 -> category.equalsIgnoreCase("Player");
+                case 2 -> category.equalsIgnoreCase("Visuals") || category.equalsIgnoreCase("Render");
+                case 3 -> category.equalsIgnoreCase("Misc");
+                case 4 -> category.equalsIgnoreCase("Donut");
+                case 5 -> category.equalsIgnoreCase("Client");
+                default -> module.isPinned();
+            };
             boolean matches = term.isEmpty()
                 || module.getName().toLowerCase(Locale.ROOT).contains(term)
-                || module.getDescription().toLowerCase(Locale.ROOT).contains(term);
+                || module.getDescription().toLowerCase(Locale.ROOT).contains(term)
+                || category.toLowerCase(Locale.ROOT).contains(term);
             if ((inCategory || !term.isEmpty()) && matches) result.add(module);
         }
         return result;
@@ -360,13 +368,12 @@ public class RiftScreen extends Screen {
 
     private String categoryDescription() {
         return switch (page) {
-            case 0 -> "Combat status, cooldowns, and equipment.";
-            case 1 -> "Crystal and anchor inventory tools.";
-            case 2 -> "Mace, cart, and spear information.";
-            case 3 -> "Donut SMP and terrain intelligence.";
-            case 4 -> "Movement and inventory utilities.";
-            case 5 -> "HUDs, visuals, and render options.";
-            case 6 -> "Profiles, settings, and client tools.";
+            case 0 -> "Combat status, equipment, and combat utilities.";
+            case 1 -> "Movement, equipment, and player utilities.";
+            case 2 -> "Visual overlays and world information.";
+            case 3 -> "Small utilities and quality-of-life tools.";
+            case 4 -> "Donut SMP exploration and information tools.";
+            case 5 -> "Profiles, settings, and client controls.";
             default -> "Your pinned modules and quick toggles.";
         };
     }
