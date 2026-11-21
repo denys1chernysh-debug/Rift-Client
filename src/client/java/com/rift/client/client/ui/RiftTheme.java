@@ -42,7 +42,7 @@ public final class RiftTheme {
     }
 
     public static void panel(GuiGraphicsExtractor g, int x, int y, int width, int height, boolean selected) {
-        roundedPanel(g, x, y, width, height, 7, selected ? PANEL_HOVER : PANEL,
+        roundedPanel(g, x, y, width, height, Math.max(5, Math.min(12, height / 4)), selected ? PANEL_HOVER : PANEL,
             selected ? PURPLE : BORDER);
     }
 
