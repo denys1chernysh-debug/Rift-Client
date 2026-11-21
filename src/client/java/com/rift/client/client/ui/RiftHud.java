@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 
@@ -57,7 +58,10 @@ public final class RiftHud {
                     + Math.round(player.getAttackStrengthScale(0.0F) * 100) + "%";
                 case "Armor Status" -> {
                     int equipped = 0;
-                    for (ItemStack stack : player.getArmorSlots()) if (!stack.isEmpty()) equipped++;
+                    if (!player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) equipped++;
+                    if (!player.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) equipped++;
+                    if (!player.getItemBySlot(EquipmentSlot.LEGS).isEmpty()) equipped++;
+                    if (!player.getItemBySlot(EquipmentSlot.FEET).isEmpty()) equipped++;
                     yield "ARMOR  " + equipped + "/4 PIECES EQUIPPED";
                 }
                 default -> null;
