@@ -160,7 +160,7 @@ public class RiftScreen extends Screen {
         g.fill(0, 0, width, height, backdrop);
 
         RiftTheme.roundedPanel(g, x, y, windowW, windowH, Math.round(20 * uiScale),
-            RiftTheme.BACKGROUND, 0xFF60328A);
+            RiftTheme.BACKGROUND, 0xFF303030);
         g.fill(x + 1, y + 1, x + Math.round(SIDEBAR_W * scaleX), y + windowH - 1, RiftTheme.SIDEBAR);
         RiftSidebar.render(g, minecraft.font, x, y, Math.round(SIDEBAR_W * scaleX), windowH,
             page, ModuleManager.getFavorites().size());
@@ -179,7 +179,7 @@ public class RiftScreen extends Screen {
         int profileX = 574;
         RiftTheme.panel(g, sx(profileX, x, scaleX), sy(18, y, scaleY), Math.round(112 * scaleX), Math.round(30 * scaleY), profileMenu);
         RiftTheme.roundedRect(g, sx(profileX + 5, x, scaleX), sy(22, y, scaleY),
-            Math.round(20 * scaleX), Math.round(22 * scaleY), Math.round(7 * scaleX), 0xFF8432D6);
+            Math.round(20 * scaleX), Math.round(22 * scaleY), Math.round(7 * scaleX), 0xFF555555);
         RiftTheme.text(g, minecraft.font, "R", sx(profileX + 12, x, scaleX), sy(28, y, scaleY), RiftTheme.WHITE);
         RiftTheme.text(g, minecraft.font, "ACTIVE PROFILE", sx(profileX + 31, x, scaleX), sy(23, y, scaleY), RiftTheme.MUTED);
         RiftTheme.text(g, minecraft.font, profile, sx(profileX + 31, x, scaleX), sy(34, y, scaleY), RiftTheme.WHITE);
@@ -239,8 +239,8 @@ public class RiftScreen extends Screen {
                 sx(gridX + 18, x, scaleX), sy(gridY + 55, y, scaleY), RiftTheme.GRAY);
         }
 
-        g.fill(x + Math.round(1 * scaleX), sy(425, y, scaleY), x + windowW - 1, y + windowH - 1, 0xFF10091C);
-        g.fill(x + Math.round(SIDEBAR_W * scaleX), sy(425, y, scaleY), x + windowW - 1, sy(426, y, scaleY), 0xFF2C1A40);
+        g.fill(x + Math.round(1 * scaleX), sy(425, y, scaleY), x + windowW - 1, y + windowH - 1, 0xFF0C0C0C);
+        g.fill(x + Math.round(SIDEBAR_W * scaleX), sy(425, y, scaleY), x + windowW - 1, sy(426, y, scaleY), 0xFF2A2A2A);
         RiftTheme.panel(g, sx(mainX, x, scaleX), sy(434, y, scaleY), Math.round(220 * scaleX), Math.round(34 * scaleY), false);
         RiftTheme.text(g, minecraft.font, "↶  Reset Settings",
             sx(mainX + 77, x, scaleX), sy(447, y, scaleY), RiftTheme.GRAY);
@@ -248,7 +248,7 @@ public class RiftScreen extends Screen {
             sx(406, x, scaleX), sy(408, y, scaleY), RiftTheme.MUTED);
         RiftTheme.roundedPanel(g, sx(540, x, scaleX), sy(434, y, scaleY),
             Math.round(202 * scaleX), Math.round(34 * scaleY), Math.round(8 * scaleX),
-            0xFF35175B, 0xFF67339A);
+            0xFF292929, 0xFF606060);
         RiftTheme.text(g, minecraft.font, "↓  Save Settings",
             sx(601, x, scaleX), sy(447, y, scaleY), RiftTheme.WHITE);
 
@@ -303,7 +303,7 @@ public class RiftScreen extends Screen {
         int ph = Math.round(250 * scaleY);
         g.fill(originX, originY, originX + Math.round(760 * scaleX), originY + Math.round(480 * scaleY), 0x55000000);
         RiftTheme.panel(g, px, py, pw, ph, true);
-        g.outline(px, py, pw, ph, 0xFF7041A0);
+        g.outline(px, py, pw, ph, 0xFF555555);
         RiftTheme.text(g, minecraft.font, settingsModule.getName().toUpperCase(Locale.ROOT),
             px + 18, py + 17, RiftTheme.WHITE);
         RiftTheme.text(g, minecraft.font, "VISUAL RANGE  /  LOADED CLIENT DATA ONLY",
@@ -315,7 +315,7 @@ public class RiftScreen extends Screen {
         int trackX = px + 20;
         int trackY = py + 84;
         int trackW = pw - 40;
-        g.fill(trackX, trackY, trackX + trackW, trackY + 4, 0xFF39313F);
+        g.fill(trackX, trackY, trackX + trackW, trackY + 4, 0xFF3B3B3B);
         int knobX = trackX + Math.round((range - EspSettings.MIN_RANGE)
             / (float)(EspSettings.MAX_RANGE - EspSettings.MIN_RANGE) * trackW);
         g.fill(trackX, trackY, knobX, trackY + 4, RiftTheme.PURPLE);
@@ -329,15 +329,15 @@ public class RiftScreen extends Screen {
             drawEspToggle(g, px + 18, py + 181, "Shulkers", EspSettings.showStorageShulkers());
             drawEspToggle(g, px + 220, py + 181, "Other storage", EspSettings.showStorageOther());
         }
-        g.fill(px + pw - 112, py + ph - 34, px + pw - 18, py + ph - 12, 0xFF3A2054);
-        g.outline(px + pw - 112, py + ph - 34, 94, 22, 0xFF7650A0);
+        g.fill(px + pw - 112, py + ph - 34, px + pw - 18, py + ph - 12, 0xFF303030);
+        g.outline(px + pw - 112, py + ph - 34, 94, 22, 0xFF606060);
         RiftTheme.text(g, minecraft.font, "CLOSE", px + pw - 80, py + ph - 27, RiftTheme.WHITE);
         RiftTheme.text(g, minecraft.font, "Changes apply immediately", px + 18, py + ph - 27, RiftTheme.MUTED);
     }
 
     private void drawEspToggle(GuiGraphicsExtractor g, int x, int y, String label, boolean enabled) {
-        g.fill(x, y, x + 13, y + 13, enabled ? 0xFF7540A8 : 0xFF24202B);
-        g.outline(x, y, 13, 13, enabled ? 0xFF9865C8 : 0xFF51475A);
+        g.fill(x, y, x + 13, y + 13, enabled ? 0xFF666666 : 0xFF242424);
+        g.outline(x, y, 13, 13, enabled ? 0xFF888888 : 0xFF555555);
         if (enabled) RiftTheme.text(g, minecraft.font, "✓", x + 2, y + 1, RiftTheme.WHITE);
         RiftTheme.text(g, minecraft.font, label, x + 20, y + 2, RiftTheme.GRAY);
     }
