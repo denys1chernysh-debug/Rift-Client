@@ -24,11 +24,72 @@ public final class BasicModules {
         registered = true;
 
         // Combat
-        add("Aim Assist", "Smoothly adjusts aim toward a target.", "Combat", false);
-        add("Triggerbot", "Attacks when a valid target is under the crosshair.", "Combat", false);
+        ModuleManager.register(new Module("Aim Assist", "Gently nudges your view toward the nearest player already close to your crosshair.", "Combat") {
+            @Override public void onTick() {
+                Minecraft mc = Minecraft.getInstance();
+                LocalPlayer player = mc.player;
+                if (player == null || mc.level == null || !player.isAlive()) return;
+                net.minecraft.world.entity.player.Player best = null;
+                double bestDistance = 4.5 * 4.5;
+                var look = player.getLookAngle();
+                for (var target : mc.level.players()) {
+                    if (target == player || !target.isAlive() || target.isRemoved()) continue;
+                    double distance = player.distanceToSqr(target);
+                    if (distance > bestDistance) continue;
+                    var direction = target.getBoundingBox().getCenter().subtract(player.getEyePosition()).normalize();
+                    if (look.dot(direction) < 0.78) continue;
+                    best = target;
+                    bestDistance = distance;
+                }
+                if (best == null) return;
+                var delta = best.getBoundingBox().getCenter().subtract(player.getEyePosition());
+                double horizontal = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
+                float yaw = (float)(Math.toDegrees(Math.atan2(delta.z, delta.x)) - 90.0);
+                float pitch = (float)-Math.toDegrees(Math.atan2(delta.y, horizontal));
+                player.setYRot(player.getYRot() + wrapDegrees(yaw - player.getYRot()) * 0.12f);
+                player.setXRot(player.getXRot() + (pitch - player.getXRot()) * 0.12f);
+            }
+        });
+        ModuleManager.register(new Module("Triggerbot", "Attacks a living player only when they are directly under your crosshair and in normal reach.", "Combat") {
+            @Override public void onTick() {
+                Minecraft mc = Minecraft.getInstance();
+                LocalPlayer player = mc.player;
+                if (player == null || mc.gameMode == null || !player.isAlive()
+                    || !(mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit)) return;
+                if (!(hit.getEntity() instanceof net.minecraft.world.entity.player.Player target)
+                    || target == player || !target.isAlive() || player.distanceToSqr(target) > 3.0 * 3.0) return;
+                if (player.getAttackStrengthScale(0.5f) >= 1.0f) {
+                    mc.gameMode.attack(player, target);
+                    player.swing(InteractionHand.MAIN_HAND);
+                }
+            }
+        });
         add("Auto Crystal", "Crystal placement and detonation helper.", "Combat", false);
         add("Anchor Macro", "Respawn-anchor charge and detonation helper.", "Combat", false);
-        add("Auto Mace", "Mace swap timing helper.", "Combat", false);
+        ModuleManager.register(new Module("Auto Mace", "Selects a hotbar mace during a falling attack and restores your previous slot after landing.", "Combat") {
+            private int previousSlot = -1;
+            @Override public void onTick() {
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (player == null || !player.isAlive()) return;
+                if (player.getDeltaMovement().y < -0.08 && player.fallDistance > 2.0f) {
+                    for (int slot = 0; slot < 9; slot++) {
+                        if (player.getInventory().getItem(slot).is(Items.MACE)) {
+                            if (previousSlot < 0) previousSlot = player.getInventory().selected;
+                            player.getInventory().selected = slot;
+                            return;
+                        }
+                    }
+                } else if (player.onGround() && previousSlot >= 0) {
+                    player.getInventory().selected = previousSlot;
+                    previousSlot = -1;
+                }
+            }
+            @Override public void onDisable() {
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (player != null && previousSlot >= 0) player.getInventory().selected = previousSlot;
+                previousSlot = -1;
+            }
+        });
 
         // Player
         ModuleManager.register(new Module("Sprint", "Keeps sprint active while you move.", "Player") {
@@ -272,7 +333,7 @@ public final class BasicModules {
         });
     }
 
-    private static Field findField(Class<?> type, String name) {
+    private static float wrapDegrees(float angle) {\n        angle %= 360.0f;\n        if (angle >= 180.0f) angle -= 360.0f;\n        if (angle < -180.0f) angle += 360.0f;\n        return angle;\n    }\n\n    private static Field findField(Class<?> type, String name) {
         for (Class<?> current = type; current != null; current = current.getSuperclass()) {
             try { return current.getDeclaredField(name); }
             catch (NoSuchFieldException ignored) {}
