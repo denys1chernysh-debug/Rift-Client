@@ -27,7 +27,7 @@ public class RiftScreen extends Screen {
     private static final int BASE_H = 480;
     private static final int SIDEBAR_W = 152;
 
-    private int page;
+    private int page = 1;
     private int scroll;
     private String search = "";
     private boolean searchFocused;
@@ -152,12 +152,16 @@ public class RiftScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         super.extractRenderState(g, mouseX, mouseY, delta);
-        int windowW = Math.min(1200, width - 28);
-        int windowH = Math.min(760, height - 28);
+        // Keep the design's aspect ratio: never stretch the GUI to fit the screen.
+        float uiScale = Math.min((width - 28f) / BASE_W, (height - 28f) / BASE_H);
+        uiScale = Math.min(uiScale, 1200f / BASE_W);
+        uiScale = Math.max(0.5f, uiScale);
+        int windowW = Math.round(BASE_W * uiScale);
+        int windowH = Math.round(BASE_H * uiScale);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        float scaleX = windowW / (float) BASE_W;
-        float scaleY = windowH / (float) BASE_H;
+        float scaleX = uiScale;
+        float scaleY = uiScale;
         int mx = Math.round((mouseX - x) / scaleX);
         int my = Math.round((mouseY - y) / scaleY);
         float open = Math.min(1f, (System.currentTimeMillis() - openedAt) / 190f);
@@ -380,12 +384,16 @@ public class RiftScreen extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int windowW = Math.min(1200, width - 28);
-        int windowH = Math.min(760, height - 28);
+        // Keep the design's aspect ratio: never stretch the GUI to fit the screen.
+        float uiScale = Math.min((width - 28f) / BASE_W, (height - 28f) / BASE_H);
+        uiScale = Math.min(uiScale, 1200f / BASE_W);
+        uiScale = Math.max(0.5f, uiScale);
+        int windowW = Math.round(BASE_W * uiScale);
+        int windowH = Math.round(BASE_H * uiScale);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        float scaleX = windowW / (float) BASE_W;
-        float scaleY = windowH / (float) BASE_H;
+        float scaleX = uiScale;
+        float scaleY = uiScale;
         int mx = (int) Math.round((event.x() - x) / scaleX);
         int my = (int) Math.round((event.y() - y) / scaleY);
 
@@ -538,12 +546,16 @@ public class RiftScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        int windowW = Math.min(1200, width - 28);
-        int windowH = Math.min(760, height - 28);
+        // Keep the design's aspect ratio: never stretch the GUI to fit the screen.
+        float uiScale = Math.min((width - 28f) / BASE_W, (height - 28f) / BASE_H);
+        uiScale = Math.min(uiScale, 1200f / BASE_W);
+        uiScale = Math.max(0.5f, uiScale);
+        int windowW = Math.round(BASE_W * uiScale);
+        int windowH = Math.round(BASE_H * uiScale);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        float scaleX = windowW / (float) BASE_W;
-        float scaleY = windowH / (float) BASE_H;
+        float scaleX = uiScale;
+        float scaleY = uiScale;
         int contentLeft = x + Math.round(SIDEBAR_W * scaleX);
         int contentTop = y + Math.round(115 * scaleY);
         int contentBottom = y + Math.round(425 * scaleY);
