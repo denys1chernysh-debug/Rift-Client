@@ -6,17 +6,17 @@ import net.minecraft.client.gui.Font;
 public final class RiftTheme {
     private RiftTheme() {}
 
-    public static final int BACKGROUND = 0xFF0B0615;
-    public static final int SIDEBAR = 0xFF170D2A;
-    public static final int PANEL = 0xFF160D26;
-    public static final int PANEL_HOVER = 0xFF24113D;
-    public static final int PURPLE = 0xFF9B43F4;
-    public static final int PURPLE_GLOW = 0xFF7625C8;
-    public static final int BORDER = 0xFF392052;
-    public static final int WHITE = 0xFFF4EEFC;
-    public static final int GRAY = 0xFF9A8AAA;
-    public static final int MUTED = 0xFF685B78;
-    public static final int GREEN = 0xFF36E59A;
+    public static final int BACKGROUND = 0xFF0B0A12;
+    public static final int SIDEBAR = 0xFF100E1B;
+    public static final int PANEL = 0xFF161324;
+    public static final int PANEL_HOVER = 0xFF1D1930;
+    public static final int PURPLE = 0xFF8B5CF6;
+    public static final int PURPLE_GLOW = 0xFFA855F7;
+    public static final int BORDER = 0xFF241F38;
+    public static final int WHITE = 0xFFF8FAFC;
+    public static final int GRAY = 0xFF8E8AA8;
+    public static final int MUTED = 0xFF68627F;
+    public static final int GREEN = 0xFF4ADE80;
 
     public static void panel(GuiGraphicsExtractor g, int x, int y, int width, int height, boolean selected) {
         g.fill(x, y, x + width, y + height, selected ? PANEL_HOVER : PANEL);
@@ -28,7 +28,7 @@ public final class RiftTheme {
     }
 
     public static void toggle(GuiGraphicsExtractor g, int x, int y, float progress) {
-        int track = progress > 0.5f ? PURPLE_GLOW : 0xFF30263B;
+        int track = progress > 0.5f ? PURPLE_GLOW : 0xFF343044;
         g.fill(x, y, x + 38, y + 20, track);
         int knobX = x + 3 + Math.round(17 * progress);
         g.fill(knobX, y + 3, knobX + 14, y + 17, WHITE);
