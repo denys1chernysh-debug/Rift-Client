@@ -17,7 +17,7 @@ public final class RiftHud {
     public static void extract(GuiGraphicsExtractor graphics, net.minecraft.client.DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || mc.screen != null) return;
+        if (player == null || mc.gui.screen() != null) return;
 
         Font font = mc.font;
         int x = 10;
