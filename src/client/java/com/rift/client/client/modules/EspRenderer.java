@@ -228,7 +228,7 @@ public final class EspRenderer {
 
     private static void render(LevelRenderContext context) {
         if (frameMarkers.isEmpty()) return;
-        RenderPipeline pipeline = THROUGH_WALLS;
+        RenderPipeline pipeline = EspSettings.isThroughWalls() ? THROUGH_WALLS : RenderPipelines.DEBUG_FILLED_BOX;
         VertexFormat format = pipeline.getVertexFormatBinding(0);
         if (format == null) return;
 
