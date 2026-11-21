@@ -18,9 +18,32 @@ public final class RiftTheme {
     public static final int MUTED = 0xFF68627F;
     public static final int GREEN = 0xFF4ADE80;
 
+    /** Draw a rounded rectangle using horizontal scanlines (Minecraft GUI has no CSS-style radius primitive). */
+    public static void roundedRect(GuiGraphicsExtractor g, int x, int y, int width, int height, int radius, int color) {
+        if (width <= 0 || height <= 0) return;
+        int r = Math.max(0, Math.min(radius, Math.min(width, height) / 2));
+        if (r == 0) {
+            g.fill(x, y, x + width, y + height, color);
+            return;
+        }
+        for (int row = 0; row < height; row++) {
+            double dy = row < r ? r - row - 0.5
+                : row >= height - r ? row - (height - r) + 0.5 : 0.0;
+            int inset = dy <= 0 ? 0
+                : (int)Math.ceil(r - Math.sqrt(Math.max(0.0, r * r - dy * dy)));
+            g.fill(x + inset, y + row, x + width - inset, y + row + 1, color);
+        }
+    }
+
+    public static void roundedPanel(GuiGraphicsExtractor g, int x, int y, int width, int height,
+                                    int radius, int fill, int border) {
+        roundedRect(g, x, y, width, height, radius, border);
+        roundedRect(g, x + 1, y + 1, width - 2, height - 2, Math.max(1, radius - 1), fill);
+    }
+
     public static void panel(GuiGraphicsExtractor g, int x, int y, int width, int height, boolean selected) {
-        g.fill(x, y, x + width, y + height, selected ? PANEL_HOVER : PANEL);
-        g.outline(x, y, width, height, selected ? PURPLE : BORDER);
+        roundedPanel(g, x, y, width, height, 7, selected ? PANEL_HOVER : PANEL,
+            selected ? PURPLE : BORDER);
     }
 
     public static void text(GuiGraphicsExtractor g, Font font, String message, int x, int y, int color) {
@@ -29,9 +52,9 @@ public final class RiftTheme {
 
     public static void toggle(GuiGraphicsExtractor g, int x, int y, float progress) {
         int track = progress > 0.5f ? PURPLE_GLOW : 0xFF343044;
-        g.fill(x, y, x + 38, y + 20, track);
+        roundedRect(g, x, y, 38, 20, 10, track);
         int knobX = x + 3 + Math.round(17 * progress);
-        g.fill(knobX, y + 3, knobX + 14, y + 17, WHITE);
+        roundedRect(g, knobX, y + 3, 14, 14, 7, WHITE);
     }
 
     public static int mix(int from, int to, float amount) {
