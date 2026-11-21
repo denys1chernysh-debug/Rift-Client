@@ -1,7 +1,7 @@
 package com.rift.client.client;
 
 import com.rift.client.client.modules.Module;
-import com.rift.client.client.modules.ModuleManager;
+import com.rift.client.client.modules.ModuleManager;\nimport com.rift.client.client.modules.EspSettings;
 import com.rift.client.client.ui.RiftModuleCard;
 import com.rift.client.client.ui.RiftSidebar;
 import com.rift.client.client.ui.RiftTheme;
@@ -228,7 +228,9 @@ public class RiftScreen extends Screen {
             }
         }
 
-        if (settingsOpen || settingsModule != null) {
+        if (settingsModule != null && isEspModule(settingsModule)) {
+            renderEspSettings(g, x, y, scaleX, scaleY);
+        } else if (settingsOpen || settingsModule != null) {
             int boxX = sx(476, x, scaleX);
             int boxY = sy(235, y, scaleY);
             RiftTheme.panel(g, boxX, boxY, Math.round(266 * scaleX), Math.round(126 * scaleY), true);
@@ -251,6 +253,79 @@ public class RiftScreen extends Screen {
                 RiftTheme.text(g, minecraft.font, "CLICK TO CLOSE", boxX + 12, boxY + 105, RiftTheme.MUTED);
             }
         }
+    }
+
+    private boolean isEspModule(Module module) {
+        return module.getName().equals("Player ESP")
+            || module.getName().equals("Storage ESP")
+            || module.getName().equals("Block ESP");
+    }
+
+    private void renderEspSettings(GuiGraphicsExtractor g, int originX, int originY, float scaleX, float scaleY) {
+        int px = sx(150, originX, scaleX);
+        int py = sy(105, originY, scaleY);
+        int pw = Math.round(460 * scaleX);
+        int ph = Math.round(250 * scaleY);
+        g.fill(originX, originY, originX + Math.round(BASE_W * scaleX), originY + Math.round(BASE_H * scaleY), 0x55000000);
+        RiftTheme.panel(g, px, py, pw, ph, true);
+        g.outline(px, py, pw, ph, 0xFF7041A0);
+        RiftTheme.text(g, minecraft.font, settingsModule.getName().toUpperCase(Locale.ROOT),
+            px + 18, py + 17, RiftTheme.WHITE);
+        RiftTheme.text(g, minecraft.font, "VISUAL RANGE  /  LOADED CLIENT DATA ONLY",
+            px + 18, py + 34, RiftTheme.MUTED);
+
+        int range = EspSettings.getRange(settingsModule.getName());
+        RiftTheme.text(g, minecraft.font, "Render distance", px + 18, py + 61, RiftTheme.GRAY);
+        RiftTheme.text(g, minecraft.font, range + " blocks", px + pw - 92, py + 61, RiftTheme.PURPLE);
+        int trackX = px + 20;
+        int trackY = py + 84;
+        int trackW = pw - 40;
+        g.fill(trackX, trackY, trackX + trackW, trackY + 4, 0xFF39313F);
+        int knobX = trackX + Math.round((range - EspSettings.MIN_RANGE)
+            / (float)(EspSettings.MAX_RANGE - EspSettings.MIN_RANGE) * trackW);
+        g.fill(trackX, trackY, knobX, trackY + 4, RiftTheme.PURPLE);
+        g.fill(knobX - 4, trackY - 4, knobX + 5, trackY + 9, RiftTheme.WHITE);
+        RiftTheme.text(g, minecraft.font, "16", trackX, trackY + 13, RiftTheme.MUTED);
+        RiftTheme.text(g, minecraft.font, "256", trackX + trackW - 18, trackY + 13, RiftTheme.MUTED);
+
+        drawEspToggle(g, px + 18, py + 119, "Through walls", EspSettings.isThroughWalls());
+        if (settingsModule.getName().equals("Storage ESP")) {
+            drawEspToggle(g, px + 18, py + 151, "Chests", EspSettings.showStorageChests());
+            drawEspToggle(g, px + 220, py + 151, "Barrels", EspSettings.showStorageBarrels());
+            drawEspToggle(g, px + 18, py + 181, "Shulkers", EspSettings.showStorageShulkers());
+            drawEspToggle(g, px + 220, py + 181, "Other storage", EspSettings.showStorageOther());
+        } else if (settingsModule.getName().equals("Block ESP")) {
+            drawEspToggle(g, px + 18, py + 151, "Obsidian", EspSettings.showBlockObsidian());
+            drawEspToggle(g, px + 220, py + 151, "Beacons", EspSettings.showBlockBeacons());
+            drawEspToggle(g, px + 18, py + 181, "Pistons", EspSettings.showBlockPistons());
+            drawEspToggle(g, px + 220, py + 181, "Other blocks", EspSettings.showBlockOther());
+        }
+        g.fill(px + pw - 112, py + ph - 34, px + pw - 18, py + ph - 12, 0xFF3A2054);
+        g.outline(px + pw - 112, py + ph - 34, 94, 22, 0xFF7650A0);
+        RiftTheme.text(g, minecraft.font, "CLOSE", px + pw - 80, py + ph - 27, RiftTheme.WHITE);
+        RiftTheme.text(g, minecraft.font, "Changes apply immediately", px + 18, py + ph - 27, RiftTheme.MUTED);
+    }
+
+    private void drawEspToggle(GuiGraphicsExtractor g, int x, int y, String label, boolean enabled) {
+        g.fill(x, y, x + 13, y + 13, enabled ? 0xFF7540A8 : 0xFF24202B);
+        g.outline(x, y, 13, 13, enabled ? 0xFF9865C8 : 0xFF51475A);
+        if (enabled) RiftTheme.text(g, minecraft.font, "✓", x + 2, y + 1, RiftTheme.WHITE);
+        RiftTheme.text(g, minecraft.font, label, x + 20, y + 2, RiftTheme.GRAY);
+    }
+
+    private void toggleEspOption(String option) {
+        switch (option) {
+            case "through" -> EspSettings.setThroughWalls(!EspSettings.isThroughWalls());
+            case "chests" -> EspSettings.setShowStorageChests(!EspSettings.showStorageChests());
+            case "barrels" -> EspSettings.setShowStorageBarrels(!EspSettings.showStorageBarrels());
+            case "shulkers" -> EspSettings.setShowStorageShulkers(!EspSettings.showStorageShulkers());
+            case "storageOther" -> EspSettings.setShowStorageOther(!EspSettings.showStorageOther());
+            case "obsidian" -> EspSettings.setShowBlockObsidian(!EspSettings.showBlockObsidian());
+            case "beacons" -> EspSettings.setShowBlockBeacons(!EspSettings.showBlockBeacons());
+            case "pistons" -> EspSettings.setShowBlockPistons(!EspSettings.showBlockPistons());
+            case "blockOther" -> EspSettings.setShowBlockOther(!EspSettings.showBlockOther());
+        }
+        saveProfile();
     }
 
     private String categoryDescription() {
@@ -314,6 +389,37 @@ public class RiftScreen extends Screen {
             return true;
         }
 
+        if (settingsModule != null && isEspModule(settingsModule)) {
+            if (mx < 150 || mx > 610 || my < 105 || my > 355) {
+                settingsModule = null;
+                return true;
+            }
+            int trackLeft = 170;
+            int trackRight = 590;
+            if (my >= 184 && my <= 205) {
+                float ratio = Math.max(0f, Math.min(1f, (mx - trackLeft) / (float)(trackRight - trackLeft)));
+                int value = EspSettings.MIN_RANGE + Math.round(ratio * (EspSettings.MAX_RANGE - EspSettings.MIN_RANGE));
+                EspSettings.setRange(settingsModule.getName(), value);
+                saveProfile();
+                return true;
+            }
+            if (my >= 222 && my <= 242 && mx >= 168 && mx <= 310) {
+                toggleEspOption("through"); return true;
+            }
+            if (settingsModule.getName().equals("Storage ESP")) {
+                if (my >= 254 && my <= 274 && mx >= 168 && mx <= 350) { toggleEspOption("chests"); return true; }
+                if (my >= 254 && my <= 274 && mx >= 370 && mx <= 590) { toggleEspOption("barrels"); return true; }
+                if (my >= 284 && my <= 304 && mx >= 168 && mx <= 350) { toggleEspOption("shulkers"); return true; }
+                if (my >= 284 && my <= 304 && mx >= 370 && mx <= 590) { toggleEspOption("storageOther"); return true; }
+            } else if (settingsModule.getName().equals("Block ESP")) {
+                if (my >= 254 && my <= 274 && mx >= 168 && mx <= 350) { toggleEspOption("obsidian"); return true; }
+                if (my >= 254 && my <= 274 && mx >= 370 && mx <= 590) { toggleEspOption("beacons"); return true; }
+                if (my >= 284 && my <= 304 && mx >= 168 && mx <= 350) { toggleEspOption("pistons"); return true; }
+                if (my >= 284 && my <= 304 && mx >= 370 && mx <= 590) { toggleEspOption("blockOther"); return true; }
+            }
+            settingsModule = null;
+            return true;
+        }
         if (settingsOpen && mx >= 476 && mx <= 742 && my >= 235 && my <= 361) {
             settingsOpen = false;
             return true;
