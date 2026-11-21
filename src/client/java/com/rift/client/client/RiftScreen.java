@@ -23,8 +23,10 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public class RiftScreen extends Screen {
-    private static final int BASE_W = 760;
-    private static final int BASE_H = 480;
+    private static final int BASE_W = 1200;
+    private static final int BASE_H = 760;
+    // Layout coordinates are authored on the original 760x480 design grid.
+    private static final float DESIGN_RATIO = 1200f / 760f;
     private static final int SIDEBAR_W = 152;
 
     private int page = 1;
@@ -49,9 +51,9 @@ public class RiftScreen extends Screen {
         for (Module module : ModuleManager.getModules()) {
             String category = module.getCategory();
             boolean inCategory = switch (page) {
-                case 0 -> category.equalsIgnoreCase("Combat") || category.equalsIgnoreCase("Crystal") || category.equalsIgnoreCase("Mace");
+                case 0 -> category.equalsIgnoreCase("Combat");
                 case 1 -> category.equalsIgnoreCase("Player");
-                case 2 -> category.equalsIgnoreCase("Visuals") || category.equalsIgnoreCase("Render");
+                case 2 -> category.equalsIgnoreCase("Render");
                 case 3 -> category.equalsIgnoreCase("Misc");
                 case 4 -> category.equalsIgnoreCase("Donut");
                 case 5 -> category.equalsIgnoreCase("Client");
@@ -80,16 +82,11 @@ public class RiftScreen extends Screen {
             profile = properties.getProperty("profile", "Default");
             EspSettings.setRange("Player ESP", readInt(properties, "esp.player.range", 256));
             EspSettings.setRange("Storage ESP", readInt(properties, "esp.storage.range", 256));
-            EspSettings.setRange("Block ESP", readInt(properties, "esp.block.range", 256));
             EspSettings.setThroughWalls(Boolean.parseBoolean(properties.getProperty("esp.throughWalls", "true")));
             EspSettings.setShowStorageChests(Boolean.parseBoolean(properties.getProperty("esp.storage.chests", "true")));
             EspSettings.setShowStorageBarrels(Boolean.parseBoolean(properties.getProperty("esp.storage.barrels", "true")));
             EspSettings.setShowStorageShulkers(Boolean.parseBoolean(properties.getProperty("esp.storage.shulkers", "true")));
             EspSettings.setShowStorageOther(Boolean.parseBoolean(properties.getProperty("esp.storage.other", "true")));
-            EspSettings.setShowBlockObsidian(Boolean.parseBoolean(properties.getProperty("esp.blocks.obsidian", "true")));
-            EspSettings.setShowBlockBeacons(Boolean.parseBoolean(properties.getProperty("esp.blocks.beacons", "true")));
-            EspSettings.setShowBlockPistons(Boolean.parseBoolean(properties.getProperty("esp.blocks.pistons", "true")));
-            EspSettings.setShowBlockOther(Boolean.parseBoolean(properties.getProperty("esp.blocks.other", "true")));
             for (Module module : ModuleManager.getModules()) {
                 String key = moduleKey(module);
                 module.setPinned(Boolean.parseBoolean(properties.getProperty(key + ".pinned", "false")));
@@ -109,16 +106,11 @@ public class RiftScreen extends Screen {
         properties.setProperty("profile", profile);
         properties.setProperty("esp.player.range", Integer.toString(EspSettings.getRange("Player ESP")));
         properties.setProperty("esp.storage.range", Integer.toString(EspSettings.getRange("Storage ESP")));
-        properties.setProperty("esp.block.range", Integer.toString(EspSettings.getRange("Block ESP")));
         properties.setProperty("esp.throughWalls", Boolean.toString(EspSettings.isThroughWalls()));
         properties.setProperty("esp.storage.chests", Boolean.toString(EspSettings.showStorageChests()));
         properties.setProperty("esp.storage.barrels", Boolean.toString(EspSettings.showStorageBarrels()));
         properties.setProperty("esp.storage.shulkers", Boolean.toString(EspSettings.showStorageShulkers()));
         properties.setProperty("esp.storage.other", Boolean.toString(EspSettings.showStorageOther()));
-        properties.setProperty("esp.blocks.obsidian", Boolean.toString(EspSettings.showBlockObsidian()));
-        properties.setProperty("esp.blocks.beacons", Boolean.toString(EspSettings.showBlockBeacons()));
-        properties.setProperty("esp.blocks.pistons", Boolean.toString(EspSettings.showBlockPistons()));
-        properties.setProperty("esp.blocks.other", Boolean.toString(EspSettings.showBlockOther()));
         for (Module module : ModuleManager.getModules()) {
             String key = moduleKey(module);
             properties.setProperty(key + ".pinned", Boolean.toString(module.isPinned()));
@@ -154,21 +146,21 @@ public class RiftScreen extends Screen {
         super.extractRenderState(g, mouseX, mouseY, delta);
         // Keep the design's aspect ratio: never stretch the GUI to fit the screen.
         float uiScale = Math.min((width - 28f) / BASE_W, (height - 28f) / BASE_H);
-        uiScale = Math.min(uiScale, 1200f / BASE_W);
-        uiScale = Math.max(0.5f, uiScale);
+        uiScale = Math.min(uiScale, 1.0f);
+        uiScale = Math.max(0.45f, uiScale);
         int windowW = Math.round(BASE_W * uiScale);
         int windowH = Math.round(BASE_H * uiScale);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        float scaleX = uiScale;
-        float scaleY = uiScale;
+        float scaleX = uiScale * DESIGN_RATIO;
+        float scaleY = uiScale * DESIGN_RATIO;
         int mx = Math.round((mouseX - x) / scaleX);
         int my = Math.round((mouseY - y) / scaleY);
         float open = Math.min(1f, (System.currentTimeMillis() - openedAt) / 190f);
         int backdrop = ((int)(0xB0 * open) << 24) | 0x00030810;
         g.fill(0, 0, width, height, backdrop);
 
-        RiftTheme.roundedPanel(g, x, y, windowW, windowH, Math.round(13 * uiScale),
+        RiftTheme.roundedPanel(g, x, y, windowW, windowH, Math.round(20 * uiScale),
             RiftTheme.BACKGROUND, 0xFF60328A);
         g.fill(x + 1, y + 1, x + Math.round(SIDEBAR_W * scaleX), y + windowH - 1, RiftTheme.SIDEBAR);
         RiftSidebar.render(g, minecraft.font, x, y, Math.round(SIDEBAR_W * scaleX), windowH,
@@ -213,8 +205,8 @@ public class RiftScreen extends Screen {
         int gridY = 124;
         int gap = 7;
         int cardW = 282;
-        int cardH = 43;
-        int rowsVisible = 6;
+        int cardH = 49;
+        int rowsVisible = 5;
         int perPage = rowsVisible * 2;
         int maxScroll = Math.max(0, modules.size() - perPage);
         scroll = Math.max(0, Math.min(scroll, maxScroll));
@@ -302,7 +294,7 @@ public class RiftScreen extends Screen {
     private boolean isEspModule(Module module) {
         return module.getName().equals("Player ESP")
             || module.getName().equals("Storage ESP")
-            || module.getName().equals("Block ESP");
+;
     }
 
     private void renderEspSettings(GuiGraphicsExtractor g, int originX, int originY, float scaleX, float scaleY) {
@@ -338,11 +330,6 @@ public class RiftScreen extends Screen {
             drawEspToggle(g, px + 220, py + 151, "Barrels", EspSettings.showStorageBarrels());
             drawEspToggle(g, px + 18, py + 181, "Shulkers", EspSettings.showStorageShulkers());
             drawEspToggle(g, px + 220, py + 181, "Other storage", EspSettings.showStorageOther());
-        } else if (settingsModule.getName().equals("Block ESP")) {
-            drawEspToggle(g, px + 18, py + 151, "Obsidian", EspSettings.showBlockObsidian());
-            drawEspToggle(g, px + 220, py + 151, "Beacons", EspSettings.showBlockBeacons());
-            drawEspToggle(g, px + 18, py + 181, "Pistons", EspSettings.showBlockPistons());
-            drawEspToggle(g, px + 220, py + 181, "Other blocks", EspSettings.showBlockOther());
         }
         g.fill(px + pw - 112, py + ph - 34, px + pw - 18, py + ph - 12, 0xFF3A2054);
         g.outline(px + pw - 112, py + ph - 34, 94, 22, 0xFF7650A0);
@@ -364,10 +351,6 @@ public class RiftScreen extends Screen {
             case "barrels" -> EspSettings.setShowStorageBarrels(!EspSettings.showStorageBarrels());
             case "shulkers" -> EspSettings.setShowStorageShulkers(!EspSettings.showStorageShulkers());
             case "storageOther" -> EspSettings.setShowStorageOther(!EspSettings.showStorageOther());
-            case "obsidian" -> EspSettings.setShowBlockObsidian(!EspSettings.showBlockObsidian());
-            case "beacons" -> EspSettings.setShowBlockBeacons(!EspSettings.showBlockBeacons());
-            case "pistons" -> EspSettings.setShowBlockPistons(!EspSettings.showBlockPistons());
-            case "blockOther" -> EspSettings.setShowBlockOther(!EspSettings.showBlockOther());
         }
         saveProfile();
     }
@@ -388,19 +371,19 @@ public class RiftScreen extends Screen {
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         // Keep the design's aspect ratio: never stretch the GUI to fit the screen.
         float uiScale = Math.min((width - 28f) / BASE_W, (height - 28f) / BASE_H);
-        uiScale = Math.min(uiScale, 1200f / BASE_W);
-        uiScale = Math.max(0.5f, uiScale);
+        uiScale = Math.min(uiScale, 1.0f);
+        uiScale = Math.max(0.45f, uiScale);
         int windowW = Math.round(BASE_W * uiScale);
         int windowH = Math.round(BASE_H * uiScale);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        float scaleX = uiScale;
-        float scaleY = uiScale;
+        float scaleX = uiScale * DESIGN_RATIO;
+        float scaleY = uiScale * DESIGN_RATIO;
         int mx = (int) Math.round((event.x() - x) / scaleX);
         int my = (int) Math.round((event.y() - y) / scaleY);
 
         for (int i = 0; i < RiftSidebar.CATEGORIES.length; i++) {
-            int itemY = 88 + i * 34;
+            int itemY = 88 + i * 27;
             if (mx >= 8 && mx <= SIDEBAR_W - 8 && my >= itemY - 8 && my <= itemY + 27) {
                 page = i; scroll = 0; search = ""; searchFocused = false;
                 settingsModule = null; profileMenu = false; settingsOpen = false;
@@ -458,11 +441,6 @@ public class RiftScreen extends Screen {
                 if (my >= 254 && my <= 274 && mx >= 370 && mx <= 590) { toggleEspOption("barrels"); return true; }
                 if (my >= 284 && my <= 304 && mx >= 168 && mx <= 350) { toggleEspOption("shulkers"); return true; }
                 if (my >= 284 && my <= 304 && mx >= 370 && mx <= 590) { toggleEspOption("storageOther"); return true; }
-            } else if (settingsModule.getName().equals("Block ESP")) {
-                if (my >= 254 && my <= 274 && mx >= 168 && mx <= 350) { toggleEspOption("obsidian"); return true; }
-                if (my >= 254 && my <= 274 && mx >= 370 && mx <= 590) { toggleEspOption("beacons"); return true; }
-                if (my >= 284 && my <= 304 && mx >= 168 && mx <= 350) { toggleEspOption("pistons"); return true; }
-                if (my >= 284 && my <= 304 && mx >= 370 && mx <= 590) { toggleEspOption("blockOther"); return true; }
             }
             settingsModule = null;
             return true;
@@ -489,26 +467,26 @@ public class RiftScreen extends Screen {
         }
 
         List<Module> modules = visibleModules();
-        int gridY = 124, cardW = 282, cardH = 43, gap = 7;
+        int gridY = 124, cardW = 282, cardH = 49, gap = 8;
         int gridX = SIDEBAR_W + 18;
-        int perPage = 12;
+        int perPage = 10;
         int shownCount = Math.min(perPage, Math.max(0, modules.size() - scroll));
         for (int i = 0; i < shownCount; i++) {
             int cardX = gridX + (i % 2) * (cardW + gap);
-            int cardY = gridY + (i / 2) * (cardH + 7);
+            int cardY = gridY + (i / 2) * (cardH + 8);
             if (mx < cardX || mx > cardX + cardW || my < cardY || my > cardY + cardH) continue;
             Module module = modules.get(scroll + i);
-            if (mx >= cardX + cardW - 83 && mx < cardX + cardW - 62) {
+            if (mx >= cardX + 8 && mx < cardX + 25 && event.button() == 1) {
                 module.setPinned(!module.isPinned());
                 saveProfile();
                 return true;
             }
-            if (mx >= cardX + cardW - 63 && mx < cardX + cardW - 50) {
+            if (mx >= cardX + cardW - 52 && mx < cardX + cardW - 31) {
                 settingsModule = module;
                 settingsOpen = false;
                 return true;
             }
-            if (mx >= cardX + cardW - 50) {
+            if (mx >= cardX + cardW - 30) {
                 if (module.isImplemented()) module.toggle();
                 saveProfile();
                 settingsModule = module;
@@ -550,19 +528,19 @@ public class RiftScreen extends Screen {
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         // Keep the design's aspect ratio: never stretch the GUI to fit the screen.
         float uiScale = Math.min((width - 28f) / BASE_W, (height - 28f) / BASE_H);
-        uiScale = Math.min(uiScale, 1200f / BASE_W);
-        uiScale = Math.max(0.5f, uiScale);
+        uiScale = Math.min(uiScale, 1.0f);
+        uiScale = Math.max(0.45f, uiScale);
         int windowW = Math.round(BASE_W * uiScale);
         int windowH = Math.round(BASE_H * uiScale);
         int x = (width - windowW) / 2;
         int y = (height - windowH) / 2;
-        float scaleX = uiScale;
-        float scaleY = uiScale;
+        float scaleX = uiScale * DESIGN_RATIO;
+        float scaleY = uiScale * DESIGN_RATIO;
         int contentLeft = x + Math.round(SIDEBAR_W * scaleX);
         int contentTop = y + Math.round(115 * scaleY);
         int contentBottom = y + Math.round(425 * scaleY);
         if (mouseX >= contentLeft && mouseY >= contentTop && mouseY <= contentBottom) {
-            int max = Math.max(0, visibleModules().size() - 12);
+            int max = Math.max(0, visibleModules().size() - 10);
             scroll = Math.max(0, Math.min(max, scroll + (verticalAmount < 0 ? 2 : -2)));
             return true;
         }
