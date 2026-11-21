@@ -2,6 +2,8 @@ package com.rift.client.client.modules;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -16,6 +18,7 @@ public final class StorageScanner {
     private static final int RADIUS = 2;
     private static final int SCAN_INTERVAL_TICKS = 10;
     private static final List<String> FOUND = new ArrayList<>();
+    private static final Set<String> SEEN = new HashSet<>();
     private static ClientLevel lastLevel;
     private static int cursor;
     private static int ticks;
@@ -55,9 +58,12 @@ public final class StorageScanner {
                     BlockPos pos = new BlockPos(baseX + dx, y, baseZ + dz);
                     BlockState state = level.getBlockState(pos);
                     if (!isStorage(state)) continue;
-                    totalFound++;
-                    if (FOUND.size() < 16) {
-                        FOUND.add(label(state) + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ());
+                    String key = pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
+                    if (SEEN.add(key)) {
+                        totalFound++;
+                        if (FOUND.size() < 16) {
+                            FOUND.add(label(state) + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ());
+                        }
                     }
                 }
             }
@@ -90,6 +96,7 @@ public final class StorageScanner {
         ticks = 0;
         totalFound = 0;
         FOUND.clear();
+        SEEN.clear();
     }
 
     public static int getTotalFound() {
