@@ -1,7 +1,8 @@
 package com.rift.client.client;
 
 import com.rift.client.client.modules.BasicModules;
-import com.rift.client.client.modules.ModuleManager;\nimport com.rift.client.client.modules.EspRenderer;
+import com.rift.client.client.modules.ModuleManager;
+import com.rift.client.client.modules.EspRenderer;
 import com.rift.client.client.ui.RiftHud;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
@@ -17,7 +18,8 @@ public class RIFTClientClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        BasicModules.register();\n        EspRenderer.register();
+        BasicModules.register();
+        EspRenderer.register();
         openClickGui = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "key.rift.clickgui",
             InputConstants.Type.KEYSYM,
@@ -33,7 +35,8 @@ public class RIFTClientClient implements ClientModInitializer {
                     client.gui.setScreen(null);
                 }
             }
-            ModuleManager.tick();\n            EspRenderer.tick();
+            ModuleManager.tick();
+            EspRenderer.tick();
         });
 
         HudElementRegistry.addLast(
