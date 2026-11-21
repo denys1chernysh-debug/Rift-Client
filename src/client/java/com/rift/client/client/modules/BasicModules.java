@@ -52,11 +52,6 @@ public final class BasicModules {
 
         // Additional modules from the requested RIFT module list.
         // These remain unavailable until their individual client behavior is implemented.
-        add("Aim Assist", "Aim assistance configuration.", "Combat", false);
-        add("Triggerbot", "Target-triggered attack configuration.", "Combat", false);
-        add("Auto Crystal", "Crystal utility configuration.", "Combat", false);
-        add("Anchor Macro", "Respawn-anchor macro configuration.", "Combat", false);
-        add("Auto Mace", "Mace utility configuration.", "Combat", false);
         add("Auto Jump Reset", "Jump-reset timing configuration.", "Player", false);
 
         // Visual and render tools
@@ -66,7 +61,6 @@ public final class BasicModules {
         add("Entity ESP", "Add visual markers for selected entities.", "Visuals", false);
         add("Target Renderer", "Display information about a selected entity.", "Visuals", false);
         add("Portal / Beacon Tracer", "Mark visible portals and beacons.", "Visuals", false);
-        add("Trajectories", "Preview projectile paths using visible client data.", "Visuals", false);
         add("Item Culler", "Reduce dropped-item rendering.", "Visuals", false);
         add("Particle Reducer", "Reduce visual particle effects.", "Visuals", false);
         add("Low Animations", "Reduce selected interface animations.", "Visuals", false);
