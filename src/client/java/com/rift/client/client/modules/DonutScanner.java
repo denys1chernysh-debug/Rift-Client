@@ -79,7 +79,7 @@ public final class DonutScanner {
                     }
                     if (state.is(Blocks.CRAFTING_TABLE) || state.is(Blocks.FURNACE)
                         || state.is(Blocks.BLAST_FURNACE) || state.is(Blocks.SMOKER)
-                        || state.is(Blocks.BED) || state.is(Blocks.BREWING_STAND)) {
+                        || state.is(Blocks.BREWING_STAND)) {
                         utility++;
                     }
                     if (state.is(Blocks.AMETHYST_BLOCK) || state.is(Blocks.BUDDING_AMETHYST)
@@ -118,7 +118,7 @@ public final class DonutScanner {
             progress.matches++;
             progress.candidates.add(new Candidate(cx, cz, score, y));
             if (progress.candidates.size() > 12) progress.candidates.remove(0);
-            mc.player.displayClientMessage(candidateMessage(scan, cx, cz, score, y), true);
+            mc.gui.hud.setOverlayMessage(candidateMessage(scan, cx, cz, score, y), true);
             progress.reportCooldown = 80;
         } else {
             reportIfReady(mc, scan, progress, total);
