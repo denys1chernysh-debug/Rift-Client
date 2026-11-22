@@ -139,10 +139,10 @@ public final class DonutScanner {
                     best = candidate;
                 }
             }
-            mc.player.displayClientMessage(candidateMessage(
+            mc.gui.hud.setOverlayMessage(candidateMessage(
                 scan, best.chunkX, best.chunkZ, best.score, best.y), true);
         } else {
-            mc.player.displayClientMessage(Component.literal(
+            mc.gui.hud.setOverlayMessage(Component.literal(
                 "RIFT " + scan.name() + ": " + state.scannedChunks + "/" + total
                     + " loaded chunks checked; no matches yet"), true);
         }
