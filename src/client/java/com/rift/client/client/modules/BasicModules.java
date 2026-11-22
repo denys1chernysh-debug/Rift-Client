@@ -63,7 +63,7 @@ public final class BasicModules {
                         bestSlot = slot;
                     }
                 }
-                player.getInventory().getSelectedSlot() = bestSlot;
+                player.getInventory().setSelectedSlot(bestSlot);
             }
         });
 
@@ -78,7 +78,7 @@ public final class BasicModules {
                 if (player == null || mc.gameMode == null || !player.isAlive()) return;
 
                 if (restoreTicks > 0 && --restoreTicks == 0 && previousSlot >= 0) {
-                    player.getInventory().getSelectedSlot() = previousSlot;
+                    player.getInventory().setSelectedSlot(previousSlot);
                     previousSlot = -1;
                 }
                 if (useCooldown > 0) useCooldown--;
@@ -88,7 +88,7 @@ public final class BasicModules {
                 if (hotbarSlot < 0) return;
 
                 previousSlot = player.getInventory().getSelectedSlot();
-                player.getInventory().getSelectedSlot() = hotbarSlot;
+                player.getInventory().setSelectedSlot(hotbarSlot);
                 mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
                 restoreTicks = 2;
                 useCooldown = 30;
@@ -107,7 +107,7 @@ public final class BasicModules {
 
             @Override public void onDisable() {
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null && previousSlot >= 0) player.getInventory().getSelectedSlot() = previousSlot;
+                if (player != null && previousSlot >= 0) player.getInventory().setSelectedSlot(previousSlot);
                 previousSlot = -1;
                 restoreTicks = 0;
                 useCooldown = 0;
@@ -174,7 +174,7 @@ public final class BasicModules {
                 LocalPlayer player = mc.player;
                 if (player == null || mc.gameMode == null) return;
                 if (restoreIn > 0 && --restoreIn == 0 && restoreSlot >= 0) {
-                    player.getInventory().getSelectedSlot() = restoreSlot;
+                    player.getInventory().setSelectedSlot(restoreSlot);
                     restoreSlot = -1;
                 }
                 if (cooldown > 0) { cooldown--; return; }
@@ -187,14 +187,14 @@ public final class BasicModules {
                 }
                 if (bottleSlot < 0) return;
                 if (restoreSlot < 0) restoreSlot = player.getInventory().getSelectedSlot();
-                player.getInventory().getSelectedSlot() = bottleSlot;
+                player.getInventory().setSelectedSlot(bottleSlot);
                 mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
                 restoreIn = 2;
                 cooldown = 4;
             }
             @Override public void onDisable() {
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null && restoreSlot >= 0) player.getInventory().getSelectedSlot() = restoreSlot;
+                if (player != null && restoreSlot >= 0) player.getInventory().setSelectedSlot(restoreSlot);
                 restoreSlot = -1;
                 restoreIn = 0;
                 cooldown = 0;
@@ -215,9 +215,9 @@ public final class BasicModules {
                     }
                 }
                 if (pearlSlot >= 0) {
-                    player.getInventory().getSelectedSlot() = pearlSlot;
+                    player.getInventory().setSelectedSlot(pearlSlot);
                     mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
-                    player.getInventory().getSelectedSlot() = oldSlot;
+                    player.getInventory().setSelectedSlot(oldSlot);
                 }
                 setEnabled(false);
             }
