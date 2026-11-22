@@ -32,7 +32,7 @@ public final class ClientUtilities {
         if (!FRIENDS.add(key)) FRIENDS.remove(key);
         save();
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null) mc.player.displayClientMessage(
+        if (mc.player != null) mc.gui.hud.setOverlayMessage(
             Component.literal("RIFT friend " + (FRIENDS.contains(key) ? "added: " : "removed: ") + name), true);
     }
 
