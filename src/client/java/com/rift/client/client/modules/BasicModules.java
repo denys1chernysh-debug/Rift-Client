@@ -23,73 +23,12 @@ public final class BasicModules {
         if (registered) return;
         registered = true;
 
-        // Combat
-        ModuleManager.register(new Module("Aim Assist", "Gently nudges your view toward the nearest player already close to your crosshair.", "Combat") {
-            @Override public void onTick() {
-                Minecraft mc = Minecraft.getInstance();
-                LocalPlayer player = mc.player;
-                if (player == null || mc.level == null || !player.isAlive()) return;
-                net.minecraft.world.entity.player.Player best = null;
-                double bestDistance = 4.5 * 4.5;
-                var look = player.getLookAngle();
-                for (var target : mc.level.players()) {
-                    if (target == player || !target.isAlive() || target.isRemoved()) continue;
-                    double distance = player.distanceToSqr(target);
-                    if (distance > bestDistance) continue;
-                    var direction = target.getBoundingBox().getCenter().subtract(player.getEyePosition()).normalize();
-                    if (look.dot(direction) < 0.78) continue;
-                    best = target;
-                    bestDistance = distance;
-                }
-                if (best == null) return;
-                var delta = best.getBoundingBox().getCenter().subtract(player.getEyePosition());
-                double horizontal = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-                float yaw = (float)(Math.toDegrees(Math.atan2(delta.z, delta.x)) - 90.0);
-                float pitch = (float)-Math.toDegrees(Math.atan2(delta.y, horizontal));
-                player.setYRot(player.getYRot() + wrapDegrees(yaw - player.getYRot()) * 0.12f);
-                player.setXRot(player.getXRot() + (pitch - player.getXRot()) * 0.12f);
-            }
-        });
-        ModuleManager.register(new Module("Triggerbot", "Attacks a living player only when they are directly under your crosshair and in normal reach.", "Combat") {
-            @Override public void onTick() {
-                Minecraft mc = Minecraft.getInstance();
-                LocalPlayer player = mc.player;
-                if (player == null || mc.gameMode == null || !player.isAlive()
-                    || !(mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit)) return;
-                if (!(hit.getEntity() instanceof net.minecraft.world.entity.player.Player target)
-                    || target == player || !target.isAlive() || player.distanceToSqr(target) > 3.0 * 3.0) return;
-                if (player.getAttackStrengthScale(0.5f) >= 1.0f) {
-                    mc.gameMode.attack(player, target);
-                    player.swing(InteractionHand.MAIN_HAND);
-                }
-            }
-        });
-        add("Auto Crystal", "Crystal placement and detonation helper.", "Combat", false);
-        add("Anchor Macro", "Respawn-anchor charge and detonation helper.", "Combat", false);
-        ModuleManager.register(new Module("Auto Mace", "Selects a hotbar mace during a falling attack and restores your previous slot after landing.", "Combat") {
-            private int previousSlot = -1;
-            @Override public void onTick() {
-                LocalPlayer player = Minecraft.getInstance().player;
-                if (player == null || !player.isAlive()) return;
-                if (player.getDeltaMovement().y < -0.08 && player.fallDistance > 2.0f) {
-                    for (int slot = 0; slot < 9; slot++) {
-                        if (player.getInventory().getItem(slot).is(Items.MACE)) {
-                            if (previousSlot < 0) previousSlot = player.getInventory().selected;
-                            player.getInventory().selected = slot;
-                            return;
-                        }
-                    }
-                } else if (player.onGround() && previousSlot >= 0) {
-                    player.getInventory().selected = previousSlot;
-                    previousSlot = -1;
-                }
-            }
-            @Override public void onDisable() {
-                LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null && previousSlot >= 0) player.getInventory().selected = previousSlot;
-                previousSlot = -1;
-            }
-        });
+        // Combat automation is intentionally not implemented.
+        add("Aim Assist", "Disabled: RIFT does not automate targeting other players.", "Combat", false);
+        add("Triggerbot", "Disabled: RIFT does not automate attacks.", "Combat", false);
+        add("Auto Crystal", "Disabled: combat automation is not available.", "Combat", false);
+        add("Anchor Macro", "Disabled: combat automation is not available.", "Combat", false);
+        add("Auto Mace", "Disabled: combat automation is not available.", "Combat", false);
 
         // Player
         ModuleManager.register(new Module("Sprint", "Keeps sprint active while you move.", "Player") {
@@ -112,7 +51,7 @@ public final class BasicModules {
                 if (player == null || mc.level == null || !(mc.hitResult instanceof BlockHitResult hit)) return;
                 BlockPos pos = hit.getBlockPos();
                 BlockState state = mc.level.getBlockState(pos);
-                int bestSlot = player.getInventory().selected;
+                int bestSlot = player.getInventory().getSelectedSlot();
                 float bestSpeed = -1.0f;
                 for (int slot = 0; slot < 9; slot++) {
                     ItemStack stack = player.getInventory().getItem(slot);
@@ -124,7 +63,7 @@ public final class BasicModules {
                         bestSlot = slot;
                     }
                 }
-                player.getInventory().selected = bestSlot;
+                player.getInventory().getSelectedSlot() = bestSlot;
             }
         });
 
@@ -139,25 +78,17 @@ public final class BasicModules {
                 if (player == null || mc.gameMode == null || !player.isAlive()) return;
 
                 if (restoreTicks > 0 && --restoreTicks == 0 && previousSlot >= 0) {
-                    player.getInventory().selected = previousSlot;
+                    player.getInventory().getSelectedSlot() = previousSlot;
                     previousSlot = -1;
                 }
                 if (useCooldown > 0) useCooldown--;
                 if (restoreTicks > 0 || useCooldown > 0 || player.getHealth() > 8.0f) return;
 
                 int hotbarSlot = findPotion(player, 0, 9);
-                if (hotbarSlot < 0) {
-                    int inventorySlot = findPotion(player, 9, 36);
-                    if (inventorySlot < 0) return;
-                    hotbarSlot = player.getInventory().selected;
-                    mc.gameMode.handleInventoryMouseClick(
-                        player.containerMenu.containerId, inventorySlot, hotbarSlot,
-                        net.minecraft.world.inventory.ClickType.SWAP, player
-                    );
-                }
+                if (hotbarSlot < 0) return;
 
-                previousSlot = player.getInventory().selected;
-                player.getInventory().selected = hotbarSlot;
+                previousSlot = player.getInventory().getSelectedSlot();
+                player.getInventory().getSelectedSlot() = hotbarSlot;
                 mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
                 restoreTicks = 2;
                 useCooldown = 30;
@@ -176,7 +107,7 @@ public final class BasicModules {
 
             @Override public void onDisable() {
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null && previousSlot >= 0) player.getInventory().selected = previousSlot;
+                if (player != null && previousSlot >= 0) player.getInventory().getSelectedSlot() = previousSlot;
                 previousSlot = -1;
                 restoreTicks = 0;
                 useCooldown = 0;
@@ -209,7 +140,7 @@ public final class BasicModules {
             @Override public void onTick() {
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (player == null || !player.isAlive() || !player.onGround()) return;
-                if (readInt(player, "hurtTime") > 0) player.jump();
+                if (readInt(player, "hurtTime") > 0) player.input.makeJump();
             }
         });
 
@@ -243,7 +174,7 @@ public final class BasicModules {
                 LocalPlayer player = mc.player;
                 if (player == null || mc.gameMode == null) return;
                 if (restoreIn > 0 && --restoreIn == 0 && restoreSlot >= 0) {
-                    player.getInventory().selected = restoreSlot;
+                    player.getInventory().getSelectedSlot() = restoreSlot;
                     restoreSlot = -1;
                 }
                 if (cooldown > 0) { cooldown--; return; }
@@ -255,15 +186,15 @@ public final class BasicModules {
                     }
                 }
                 if (bottleSlot < 0) return;
-                if (restoreSlot < 0) restoreSlot = player.getInventory().selected;
-                player.getInventory().selected = bottleSlot;
+                if (restoreSlot < 0) restoreSlot = player.getInventory().getSelectedSlot();
+                player.getInventory().getSelectedSlot() = bottleSlot;
                 mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
                 restoreIn = 2;
                 cooldown = 4;
             }
             @Override public void onDisable() {
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null && restoreSlot >= 0) player.getInventory().selected = restoreSlot;
+                if (player != null && restoreSlot >= 0) player.getInventory().getSelectedSlot() = restoreSlot;
                 restoreSlot = -1;
                 restoreIn = 0;
                 cooldown = 0;
@@ -275,7 +206,7 @@ public final class BasicModules {
                 Minecraft mc = Minecraft.getInstance();
                 LocalPlayer player = mc.player;
                 if (player == null || mc.gameMode == null) { setEnabled(false); return; }
-                int oldSlot = player.getInventory().selected;
+                int oldSlot = player.getInventory().getSelectedSlot();
                 int pearlSlot = -1;
                 for (int slot = 0; slot < 9; slot++) {
                     if (player.getInventory().getItem(slot).is(Items.ENDER_PEARL)) {
@@ -284,9 +215,9 @@ public final class BasicModules {
                     }
                 }
                 if (pearlSlot >= 0) {
-                    player.getInventory().selected = pearlSlot;
+                    player.getInventory().getSelectedSlot() = pearlSlot;
                     mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
-                    player.getInventory().selected = oldSlot;
+                    player.getInventory().getSelectedSlot() = oldSlot;
                 }
                 setEnabled(false);
             }
